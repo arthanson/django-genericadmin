@@ -156,6 +156,12 @@ if (typeof(jQuery) == 'undefined') {
   loadFile(JQUERY_LIB, "js");
 }
 
+if (typeof(GENERIC_ADMIN_DELAY_INIT) == 'undefined') {
+  // Allow init to be delayed (stopped)
+  var GENERIC_ADMIN_DELAY_INIT = false;
+}
+
 $(document).ready(function() {
-    $("[id$='object_id']").each(GenericObject);
+    if (!GENERIC_ADMIN_DELAY_INIT)
+      $("[id$='object_id']").each(GenericObject);
 });
