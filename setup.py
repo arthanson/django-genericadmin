@@ -1,7 +1,7 @@
 import os, re
 from setuptools import setup, find_packages
 
-app_name = 'geericadmin'
+app_name = 'genericadmin'
 
 def get_svn_revision(path=None):
     rev = None
@@ -67,7 +67,7 @@ for dirpath, dirnames, filenames in os.walk(src_dir):
 setup(
     name=app_name,
     version=get_svn_revision(root_dir),
-    description="Add support for generic relations within Django's admin interface.",
+    description="Adds support for generic relations within Django's admin interface.",
     author='Weston Nielson',
     author_email='wnielson@gmail.com',
     url='http://westonsnotes.blogspot.com/',
