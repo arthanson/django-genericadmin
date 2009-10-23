@@ -2,8 +2,12 @@
     genericadmin - Weston Nielson (wnielson@gmail.com)
 */
 
-var ADMIN_MEDIA_URL = '/media/';
-var JQUERY_LIB = 'http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js';
+if (typeof(JQUERY_LIB) == 'undefined')
+  var JQUERY_LIB = "http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js";
+if (typeof(GENERIC_ADMIN_DELAY_INIT) == 'undefined')
+  var GENERIC_ADMIN_DELAY_INIT = false;
+var ADMIN_MEDIA_URL = "{% admin_media_prefix %}";
+var ADMIN_OBJ_LOOKUP_URL = "{% url admin:admin_genericadmin_obj_lookup %}";
 
 function loadFile(filename, filetype) {
   if (filetype=="js"){ //if filename is a external JavaScript file
@@ -60,6 +64,8 @@ function GenericObject(i, objectIdEl) {
         if (this.contentTypeEl.value) {
             this.contentTypeId = this.contentTypeEl.value;  // If the content_type has an initial value, now is a good time to set it
             this.lookupLink.attr('href', '../../../' + MODEL_URL_ARRAY[this.contentTypeEl.value] + '/');
+            
+            this.contentTypeEl.text = MODEL_URL_ARRAY[this.contentTypeEl.value].split('/')[0] + this.contentTypeEl.text;
             
             if (this.objectIdEl.value) {
                 this.objectId = this.objectIdEl.value;
