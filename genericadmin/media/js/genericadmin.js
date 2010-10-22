@@ -148,7 +148,7 @@
 				this.object_input = elem;
 				// find the select we need to change
 				contentTypeSelect = this.prepareSelect();
-
+				
 				// install event handler for select
 				$(contentTypeSelect).change(function() {
 					var link_id;
@@ -163,7 +163,12 @@
 						});
 					}
 				});
-
+				
+				// fire change event if something is already selected
+				if ($(contentTypeSelect).val()) {
+					$(contentTypeSelect).trigger('change');
+				}
+				
 				// Bind to the onblur of the object_id input.
 				$(this.object_input).blur(this.updateObjectData());
 			}, 	
