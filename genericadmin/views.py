@@ -1,49 +1,53 @@
-from django.shortcuts import render_to_response
-from django.http import Http404, HttpResponse
-from django.template import Context, Template
-
+try: 
+    import json
+except ImportError: 
+    import simplejson as json
+    
+from django.http import HttpResponse
+from django.core import serializers
 from django.contrib.contenttypes.models import ContentType
 
-JSON_TEMPLATE = '''[{% for obj in objects %}{"contentTypeId":"{{ obj.content_type_id }}","contentTypeText":"{{ obj.content_type_text }}","objectId":"{{ obj.object_id }}","objectText":"{{ obj.object_text }}"}{% if not forloop.last %},{% endif %}{% endfor %}]'''
 
 def get_obj(content_type_id, object_id):
+    obj_dict = {
+        'content_type_id': content_type_id,
+        'object_id': object_id,
+    }
+    
     content_type = ContentType.objects.get(pk=content_type_id)
+    
+    obj_dict["content_type_text"] = unicode(content_type)
+    
     try:
         obj = content_type.get_object_for_this_type(pk=object_id)
+        obj_dict["object_text"] = unicode(obj)
+        try:
+            obj_dict["object_url"] = obj.get_absolute_url()
+        except AttributeError:
+            obj_dict["object_url"] = ""
     except:
-        obj = None
-    content_type_text = unicode(content_type)
+        obj_dict["object_text"] = ""
 
-    if obj:
-        object_text = unicode(obj)
-    else:
-        object_text = ""
-    return {
-        'content_type_text': content_type_text,
-        'content_type_id': content_type_id,
-        'object_text': object_text,
-        'object_id': object_id
-    }
+    return obj_dict
 
 def generic_lookup(request):
     if request.method == 'GET':
         objects = []
         if request.GET.has_key('content_type') and request.GET.has_key('object_id'):
             obj = get_obj(request.GET['content_type'], request.GET['object_id'])
-            objects = (obj, )
-        elif request.GET.has_key('lookup'):
-            objs = eval(request.GET['lookup'])
-            for obj in objs:
-                objects.append(get_obj(obj[0], obj[1]))
-        if objects:
-            t = Template(JSON_TEMPLATE)
-            c = Context({'objects': objects})
-            ret = t.render(c)
-            return HttpResponse(ret, mimetype='application/json')
+            objects.append(obj)
+
+        print objects
+        
+        response = HttpResponse(mimetype='application/json')
+        json.dump(objects, response, ensure_ascii=False)
+        return response
 
 def get_generic_rel_list(request):
-    return_string = "{"
+    obj_dict = {}
     for c in ContentType.objects.all().order_by('id'):
-        return_string = '%s"%d": "%s/%s",' % (return_string, c.id, c.app_label, c.model)
-    return_string = "%s}" % return_string[:-1]
-    return HttpResponse(return_string, mimetype='application/json')
+        obj_dict[c.id] = u'%s/%s' % (c.app_label, c.model)
+    
+    response = HttpResponse(mimetype='application/json')
+    json.dump(obj_dict, response, ensure_ascii=False)
+    return response
