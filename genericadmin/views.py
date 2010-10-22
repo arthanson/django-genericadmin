@@ -4,7 +4,7 @@ from django.template import Context, Template
 
 from django.contrib.contenttypes.models import ContentType
 
-JSON_TEMPLATE = '''[{% for obj in objects %}{contentTypeId:'{{ obj.content_type_id }}',contentTypeText:'{{ obj.content_type_text }}',objectId:'{{ obj.object_id }}',objectText:'{{ obj.object_text }}'}{% if not forloop.last %},{% endif %}{% endfor %}]'''
+JSON_TEMPLATE = '''[{% for obj in objects %}{"contentTypeId":"{{ obj.content_type_id }}","contentTypeText":"{{ obj.content_type_text }}","objectId":"{{ obj.object_id }}","objectText":"{{ obj.object_text }}"}{% if not forloop.last %},{% endif %}{% endfor %}]'''
 
 def get_obj(content_type_id, object_id):
     content_type = ContentType.objects.get(pk=content_type_id)
@@ -26,7 +26,6 @@ def get_obj(content_type_id, object_id):
     }
 
 def generic_lookup(request):
-    # TODO: there isn't any error checking...
     if request.method == 'GET':
         objects = []
         if request.GET.has_key('content_type') and request.GET.has_key('object_id'):
@@ -39,4 +38,12 @@ def generic_lookup(request):
         if objects:
             t = Template(JSON_TEMPLATE)
             c = Context({'objects': objects})
-            return HttpResponse(t.render(c), mimetype='text/plaintext')
+            ret = t.render(c)
+            return HttpResponse(ret, mimetype='application/json')
+
+def get_generic_rel_list(request):
+    return_string = "{"
+    for c in ContentType.objects.all().order_by('id'):
+        return_string = '%s"%d": "%s/%s",' % (return_string, c.id, c.app_label, c.model)
+    return_string = "%s}" % return_string[:-1]
+    return HttpResponse(return_string, mimetype='application/json')
