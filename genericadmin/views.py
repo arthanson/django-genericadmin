@@ -3,7 +3,7 @@ try:
 except ImportError: 
     import simplejson as json
     
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseNotAllowed
 from django.core import serializers
 from django.contrib.contenttypes.models import ContentType
 
@@ -36,18 +36,21 @@ def generic_lookup(request):
         if request.GET.has_key('content_type') and request.GET.has_key('object_id'):
             obj = get_obj(request.GET['content_type'], request.GET['object_id'])
             objects.append(obj)
-
-        print objects
         
         response = HttpResponse(mimetype='application/json')
         json.dump(objects, response, ensure_ascii=False)
         return response
+    else:
+        return HttpResponseNotAllowed(['GET'])
 
 def get_generic_rel_list(request):
-    obj_dict = {}
-    for c in ContentType.objects.all().order_by('id'):
-        obj_dict[c.id] = u'%s/%s' % (c.app_label, c.model)
+    if request.method == 'GET':
+        obj_dict = {}
+        for c in ContentType.objects.all().order_by('id'):
+            obj_dict[c.id] = u'%s/%s' % (c.app_label, c.model)
     
-    response = HttpResponse(mimetype='application/json')
-    json.dump(obj_dict, response, ensure_ascii=False)
-    return response
+        response = HttpResponse(mimetype='application/json')
+        json.dump(obj_dict, response, ensure_ascii=False)
+        return response
+    else:
+        return HttpResponseNotAllowed(['GET'])
