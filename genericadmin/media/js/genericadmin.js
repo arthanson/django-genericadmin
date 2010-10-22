@@ -22,84 +22,48 @@
 					async: false
 				});
 			},
-			// we define that here because we want to keep
-			// the prototype as clean as possible
-			arrayUnique: function(arr) {
-				var a = [];
-				var l = arr.length;
-				for(var i=0; i<l; i++) {
-					for(var j=i+1; j<l; j++) {
-						// If this[i] is found later in the array
-						if (arr[i] === arr[j]) {
-							j = ++i;
-						}
-					}
-					a.push(arr[i]);
-				}
-				return a;
-			},
 			prepareSelect: function() {
 				var that = this;
 				var opt_keys = [];
 				var opt_dict = {};
-				var key;
-				var active = false;
-				var vars;
-				var id;
 				var contentTypeSelect;
-				var to_insert;
-				var i;
-				var opt_group;
-				var option;
 
 				// should return 3 items: ["id_ingredientlist_set", "2",
 				// "content_type"]
-				vars = $(this.object_input).attr("id").split('-');
-				if (vars.length == 1) { // not an inline edit
-					id = '#id_content_type';
-				} else {
-					id = '#' + vars[0] + '-' + vars[1] + '-content_type';
+				contentTypeSelect = $('#id_content_type').first();
+				var vars = $(this.object_input).attr("id").split('-');
+				if (vars.length !== 1) { 
+					contentTypeSelect = $('#' + vars[0] + '-' + vars[1] + '-content_type').first();
 				}
-				contentTypeSelect = $(id)[0];
 
 				// polish the look of the select
 				$(contentTypeSelect).find('option').each(function() {
+					var key;
 					if (this.value) {
 						key = that.url_array[this.value].split('/')[0];
-						opt_keys.push(key);
-						to_insert = {
-								"elem": this,
-								"color": $(this).css('color'),
-								"padding": $(this).css('padding')
-						}
-						if (!opt_dict[key]) {
-							opt_dict[key] = [to_insert];
+						// create an array with unique elements
+						if ($.inArray(key, opt_keys) < 0) {
+							opt_keys.push(key);
+							// if it's the first time in array
+							// it's the first time in dict
+							opt_dict[key] = [$(this).clone()];
 						} else {
-							opt_dict[key].push(to_insert);
+							opt_dict[key].push($(this).clone());
 						}
 						$(this).remove();
 					}
 				});
 
-				opt_keys = this.arrayUnique(opt_keys);
 				opt_keys = opt_keys.sort();
-
-				for (i = 0; i < opt_keys.length; i++) {
-					key = opt_keys[i];
-					opt_group = $('<optgroup label="' + key + '"></optgroup>').css({
-						"font-style": "normal",
-						"font-weight": "bold", 
-						"color": "#999",
-						"padding-left": "2px"
+				
+				var opt_group_css = 'style="font-style:normal; font-weight:bold; color:#999; padding-left: 2px;"';
+				$.each(opt_keys, function(index, key) {
+					var opt_group = $('<optgroup label="' + key + '" ' + opt_group_css + '></optgroup>');
+					$.each(opt_dict[key], function (index, value) {
+						opt_group.append(value).css({'color': '#000'});
 					});
 					$(contentTypeSelect).append(opt_group);
-
-					for (j in opt_dict[key]) {
-						option = opt_dict[key][j]["elem"];
-						$(option).css({'color': opt_dict[key][j]["color"], 'padding': opt_dict[key][j]["padding"]});
-						opt_group.append(option);
-					}
-				}
+				});
 
 				return contentTypeSelect;
 			},
@@ -125,18 +89,14 @@
 				return id;
 			},
 			pollInputChange: function (window) {
-				var win = window;
 				var that = this;
-				var delay = 150
-				var interval_id;
-				var timer = function () {
-					if (win.closed == true) {
+				var interval_id = setInterval(function () {
+					if (window.closed == true) {
 						clearInterval(interval_id);
 						that.updateObjectData()();
 						return true;
 					}
-				}
-				interval_id = setInterval(timer, delay);
+				}, 150);
 			},
 			popRelatedObjectLookup: function(link) {
 				var name = link.id.replace(/^lookup_/, '');
@@ -161,15 +121,21 @@
 			updateObjectData: function() {
 				var that = this;
 				return function () {
-					$('#lookup_text').text('');
-					$('#lookup_text').text('loading...');
+					$('#lookup_text').text('').text('loading...');
 					$.ajax({
 						url: that.obj_url,
 						dataType: 'json',
 						data: {object_id: that.object_input.value, content_type: that.cID},
 						success: function(data) {
 							var item = data[0];
-							$('#lookup_text').text(item.content_type_text + ': ' + item.object_text);
+							if (item && item.content_type_text && item.object_text) {
+								$('#lookup_text').text(item.content_type_text + ': ' + item.object_text);
+								// run a callback to do other stuff like prepopulating url fields
+								// can't be done with normal django admin prepopulate
+								if (that.updateObjectDataCallback) {
+									that.updateObjectDataCallback(item);
+								}
+							}
 						}
 					});
 				};
@@ -198,8 +164,7 @@
 					}
 				});
 
-				// Bind to the onfocus of the window and the onblur of the
-				// object_id input.
+				// Bind to the onblur of the object_id input.
 				$(this.object_input).blur(this.updateObjectData());
 			}, 	
 	};
