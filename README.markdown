@@ -7,13 +7,13 @@ A simple django app to make the lookup of generic models easier.
 To install add it to your `INSTALLED_APPS` setting. There is no need to
 run `manage.py syncdb` because _django-genericadmin_ does not have any models.
 
-<code>
-	INSTALLED_APPS = (
-        ...
-        'genericadmin',
-        ...
-    )
-</code>
+<pre>
+INSTALLED_APPS = (
+    ...
+    'genericadmin',
+    ...
+)
+</pre>
 
 Link or copy `genericadmin.js` from `genericadmin/media/js` to your asset
 directory and set `GENERICADMIN_JS`. The path will be prepended with your
@@ -26,22 +26,22 @@ To use _django-genericadmin_ your model admin class must inherit from
 
 So a model admin like
 
-<code>
-	class NavBarEntryAdmin(admin.ModelAdmin):
-    	pass
+<pre>
+class NavBarEntryAdmin(admin.ModelAdmin):
+    pass
 
-	admin.site.register(NavBarEntry, NavBarEntryAdmin)
-</code>
+admin.site.register(NavBarEntry, NavBarEntryAdmin)
+</pre>
 
 becomes
 
-<code>
-	from genericadmin.admin import GenericAdminModelAdmin
+<pre>
+from genericadmin.admin import GenericAdminModelAdmin
 
-	class NavBarEntryAdmin(GenericAdminModelAdmin):
-    	pass
+class NavBarEntryAdmin(GenericAdminModelAdmin):
+    pass
 
-	admin.site.register(NavBarEntry, NavBarEntryAdmin)
-</code>
+admin.site.register(NavBarEntry, NavBarEntryAdmin)
+</pre>
 
 That's it.
