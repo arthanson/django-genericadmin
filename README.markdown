@@ -1,6 +1,9 @@
 # django-genericadmin
 
-A simple django app to make the lookup of generic models easier.
+A simple django app to make the lookup of generic models easier. 
+
+If used with grappelli only the model select is rendered a little nicer. 
+The rest is done by grappelli.
 
 ## Installation
 
@@ -15,9 +18,8 @@ INSTALLED_APPS = (
 )
 </pre>
 
-Link or copy `genericadmin.js` from `genericadmin/media/js` to your asset
-directory and set `GENERICADMIN_JS`. The path will be prepended with your
-`MEDIA_URL` setting.
+Link or copy `genericadmin/media/js/` to your asset directory and set
+ `GENERICADMIN_JS` to your path. 
 
 ## Usage
 
