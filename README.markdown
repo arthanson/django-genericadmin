@@ -10,13 +10,11 @@ The rest is done by grappelli.
 To install add it to your `INSTALLED_APPS` setting. There is no need to
 run `manage.py syncdb` because _django-genericadmin_ does not have any models.
 
-<pre>
-INSTALLED_APPS = (
-    ...
-    'genericadmin',
-    ...
-)
-</pre>
+    INSTALLED_APPS = (
+       ...
+       'genericadmin',
+       ...
+    )
 
 Link or copy `genericadmin/media/js/` to your asset directory and set
  `GENERICADMIN_JS` to your path. 
@@ -28,22 +26,18 @@ To use _django-genericadmin_ your model admin class must inherit from
 
 So a model admin like
 
-<pre>
-class NavBarEntryAdmin(admin.ModelAdmin):
-    pass
+    class NavBarEntryAdmin(admin.ModelAdmin):
+        pass
 
-admin.site.register(NavBarEntry, NavBarEntryAdmin)
-</pre>
+    admin.site.register(NavBarEntry, NavBarEntryAdmin)
 
 becomes
 
-<pre>
-from genericadmin.admin import GenericAdminModelAdmin
+    from genericadmin.admin import GenericAdminModelAdmin
 
-class NavBarEntryAdmin(GenericAdminModelAdmin):
-    pass
+    class NavBarEntryAdmin(GenericAdminModelAdmin):
+        pass
 
-admin.site.register(NavBarEntry, NavBarEntryAdmin)
-</pre>
+    admin.site.register(NavBarEntry, NavBarEntryAdmin)
 
 That's it.
