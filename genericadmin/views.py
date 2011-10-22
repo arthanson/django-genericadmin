@@ -43,12 +43,14 @@ def generic_lookup(request):
     else:
         return HttpResponseNotAllowed(['GET'])
 
-def get_generic_rel_list(request):
+def get_generic_rel_list(request, blacklist=()):
     if request.method == 'GET':
         obj_dict = {}
         for c in ContentType.objects.all().order_by('id'):
-            obj_dict[c.id] = u'%s/%s' % (c.app_label, c.model)
-    
+            val = u'%s/%s' % (c.app_label, c.model)
+            if val not in blacklist:
+                obj_dict[c.id] = val
+
         response = HttpResponse(mimetype='application/json')
         json.dump(obj_dict, response, ensure_ascii=False)
         return response

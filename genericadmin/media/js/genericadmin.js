@@ -3,8 +3,9 @@
 
     updated by Jan Schrewe (jschrewe@googlemail.com)
 
- */
+    updated by Troy Melhase (troy.melhase@gmail.com)
 
+ */
 (function ($) {
 	var GenericAdmin = {
 			url_array: null,
@@ -22,7 +23,7 @@
 					async: false
 				});
 			},
-			prepareSelect: function() {
+			prepareSelect: function(elem) {
 				var that = this;
 				var opt_keys = [];
 				var opt_dict = {};
@@ -30,26 +31,37 @@
 
 				// should return 3 items: ["id_ingredientlist_set", "2",
 				// "content_type"]
-				contentTypeSelect = $('#id_content_type').first();
-				var vars = $(this.object_input).attr("id").split('-');
+
+                                // FIX:  a better way to specify this for generic inlines
+                                var context = $(elem).parents('fieldset');
+                                contentTypeSelect = $("[id$='content_type']", context).first();
+				// contentTypeSelect = $('#id_content_type').first();
+
+				var vars = $( this.object_input ).attr("id").split('-');
 				if (vars.length !== 1) { 
-					contentTypeSelect = $('#' + vars[0] + '-' + vars[1] + '-content_type').first();
+			                contentTypeSelect = $('#' + vars[0] + '-' + vars[1] + '-content_type').first();
 				}
 
 				// polish the look of the select
 				$(contentTypeSelect).find('option').each(function() {
 					var key;
+
 					if (this.value) {
-						key = that.url_array[this.value].split('/')[0];
-						// create an array with unique elements
-						if ($.inArray(key, opt_keys) < 0) {
+                                                if (!that.url_array[this.value]) {
+                                                    // we've got a value that's been blacklisted,
+                                                    // so do nothing and remove it below
+                                                } else {
+  						    key = that.url_array[this.value].split('/')[0];
+						    // create an array with unique elements
+						    if ($.inArray(key, opt_keys) < 0) {
 							opt_keys.push(key);
 							// if it's the first time in array
 							// it's the first time in dict
 							opt_dict[key] = [$(this).clone()];
-						} else {
+						    } else {
 							opt_dict[key].push($(this).clone());
-						}
+						    }
+                                                }
 						$(this).remove();
 					}
 				});
@@ -67,21 +79,23 @@
 
 				return contentTypeSelect;
 			},
+
+
 			getLookupUrl: function (cID) {
 				return '../../../' + this.url_array[cID] + '/';
 			},
 			hideLookupLink: function() {
-				$('#lookup_' + this.object_input.id).unbind().remove();
+				$('#lookup_' + this.object_input.attr('id')).unbind().remove();
 				$('#lookup_text').remove();
 			},
 			showLookupLink: function () {		
 				var that = this;
 				var url = this.getLookupUrl(this.cID);
-				var id = 'lookup_' + this.object_input.id;
+				var id = 'lookup_' + this.object_input.attr('id');
 
 				var link = '<a class="related-lookup" id="' + id + '" href="' + url + '">';
 				link = link + '<img src="' + this.admin_media_url + 'img/admin/selector-search.gif" style="cursor: pointer; margin-left: 5px; margin-right: 10px;" width="16" height="16" alt="Lookup"></a>';
-				link = link + '<strong id="lookup_text" margin-left: 5px"></strong>'
+				link = link + '<strong id="lookup_text" margin-left: 5px"></strong>';
 
 				// insert link html after input element
 				$(this.object_input).after(link);
@@ -121,11 +135,12 @@
 			updateObjectData: function() {
 				var that = this;
 				return function () {
+//                                        if (!that.object_input.value) { return } // bail if no input
 					$('#lookup_text').text('').text('loading...');
 					$.ajax({
 						url: that.obj_url,
 						dataType: 'json',
-						data: {object_id: that.object_input.value, content_type: that.cID},
+						data: {object_id: that.object_input.attr('value'), content_type: that.cID},
 						success: function(data) {
 							var item = data[0];
 							if (item && item.content_type_text && item.object_text) {
@@ -140,17 +155,23 @@
 					});
 				};
 			},
+
+
 			installAdmin: function(elem) {
 				var that = this;
 				// initialize the url array
-				this.loadUrlArray();
+				that.loadUrlArray();
 				// store the base element
-				this.object_input = elem;
+				that.object_input = elem;
+
 				// find the select we need to change
-				contentTypeSelect = this.prepareSelect();
-				
+				that.object_select = that.prepareSelect(elem);
+
 				// install event handler for select
-				$(contentTypeSelect).change(function() {
+				$(that.object_select).change(function() {
+                                        // reset the object input to the associated select (this one)
+                                        that.object_input = $('#' + this.id.replace('content_type', 'object_id'));
+                                        // $(this).css('color', 'red'); // uncomment for testing
 					var link_id;
 					that.hideLookupLink();
 					// Set our objectId when the content_type is changed
@@ -165,8 +186,8 @@
 				});
 				
 				// fire change event if something is already selected
-				if ($(contentTypeSelect).val()) {
-					$(contentTypeSelect).trigger('change');
+				if ($(this.object_select).val()) {
+					$(this.object_select).trigger('change');
 				}
 				
 				// Bind to the onblur of the object_id input.
@@ -174,9 +195,13 @@
 			}, 	
 	};
 
+
+
 	$(document).ready(function() {	
 		$("[id$='object_id']").each(function(i, e) {
-			GenericAdmin.installAdmin(this);
+			$.extend({}, GenericAdmin).installAdmin(this);
 		});
 	});
+
+
 }(django.jQuery));

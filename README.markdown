@@ -41,3 +41,50 @@ becomes
     admin.site.register(NavBarEntry, NavBarEntryAdmin)
 
 That's it.
+
+
+## Inline Usage
+
+To use _django-genericadmin_ with admin inlines, your models must inherit from 
+`GenericAdminModelAdmin` as described above:
+
+<pre>
+from genericadmin.admin import GenericAdminModelAdmin
+
+class NavBarEntryAdmin(GenericAdminModelAdmin):
+    pass
+
+admin.site.register(NavBarEntry, NavBarEntryAdmin)
+</pre>
+
+Additionally the inline classes must inherit from either `GenericStackedInline`
+or `GenericTabularInline`:
+
+<pre>
+from genericadmin.admin import GenericAdminModelAdmin, GenericTabularInline
+
+class PagesInline(GenericTabularInline):
+    model = ...
+
+class NavBarEntryAdmin(GenericAdminModelAdmin):
+    inlines = [PagesInline, ]
+
+...
+</pre>
+
+Note that you can't mix and match.  If you're going to use a generic inline,
+the class using it must inherit from `GenericAdminModelAdmin`.
+
+## Blacklisting Content Types
+
+Specific content types can be removed from the content type select list.
+Example:
+
+<pre>
+class NavBarEntryAdmin(GenericAdminModelAdmin):
+    content_type_blacklist = ('auth/group', 'auth/user', )
+</pre>
+
+Note that this only happens on the client; there is no enforcement of the
+blacklist at the model level.
+
