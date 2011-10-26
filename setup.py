@@ -9,7 +9,7 @@ setup(
     author_email='wnielson@gmail.com, jschrewe@googlemail.com',
     url='http://bitbucket.org/knurpsburps/django-genericadmin/overview',
     packages = ['genericadmin'],
-    package_data={'genericadmin': ['media/js/*.js']},
+    package_data={'genericadmin': ['static/genericadmin/js/*.js']},
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Environment :: Web Environment',
