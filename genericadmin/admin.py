@@ -5,6 +5,11 @@ from django.conf import settings
 
 JS_PATH = getattr(settings, 'GENERICADMIN_JS', 'genericadmin/js/') 
 
+
+
+from django.contrib.contenttypes import generic
+
+
 class BaseGenericModelAdmin(object):
     class Media:
         js = ()
@@ -46,10 +51,10 @@ class GenericAdminModelAdmin(BaseGenericModelAdmin, admin.ModelAdmin):
     """Model admin for generic relations. """
 
 
-class GenericTabularInline(BaseGenericModelAdmin, admin.TabularInline):
+class GenericTabularInline(BaseGenericModelAdmin, generic.GenericTabularInline):
     """Model admin for generic tabular inlines. """ 
 
 
-class GenericStackedInline(BaseGenericModelAdmin, admin.StackedInline):
+class GenericStackedInline(BaseGenericModelAdmin, generic.GenericStackedInline):
     """Model admin for generic stacked inlines. """
 
