@@ -17,10 +17,9 @@ class BaseGenericModelAdmin(object):
     def __init__(self, model, admin_site):
         self.grappelli = False
         media = list(self.Media.js)
-        for app in settings.INSTALLED_APPS:
-            if app == 'grappelli':
-                media.append(JS_PATH + 'genericadmin-grappelli.js')
-                self.grappelli = True
+        if 'grappelli' in settings.INSTALLED_APPS:
+            media.append(JS_PATH + 'genericadmin-grappelli.js')
+            self.grappelli = True
         if not self.grappelli:
             media.append(JS_PATH + 'genericadmin.js')
         self.Media.js = tuple(media)

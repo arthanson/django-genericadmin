@@ -16,8 +16,12 @@ run `manage.py syncdb` because _django-genericadmin_ does not have any models.
        ...
     )
 
-Link or copy `genericadmin/media/js/` to your asset directory and set
- `GENERICADMIN_JS` to your path. 
+If you are using the staticfiles app, then run `manage.py collectstatic` and you should be 
+good to go. 
+
+If you don't know what I'm talking about or your django version < 1.3, then you
+should link or copy `genericadmin/media/js/` to your asset directory and set
+`GENERICADMIN_JS` to a the relative destination of your just copied files. 
 
 ## Usage
 
@@ -48,29 +52,25 @@ That's it.
 To use _django-genericadmin_ with admin inlines, your models must inherit from 
 `GenericAdminModelAdmin` as described above:
 
-<pre>
-from genericadmin.admin import GenericAdminModelAdmin
+	from genericadmin.admin import GenericAdminModelAdmin
 
-class NavBarEntryAdmin(GenericAdminModelAdmin):
-    pass
+	class NavBarEntryAdmin(GenericAdminModelAdmin):
+    	pass
 
-admin.site.register(NavBarEntry, NavBarEntryAdmin)
-</pre>
+	admin.site.register(NavBarEntry, NavBarEntryAdmin)
 
 Additionally the inline classes must inherit from either `GenericStackedInline`
 or `GenericTabularInline`:
 
-<pre>
-from genericadmin.admin import GenericAdminModelAdmin, GenericTabularInline
+	from genericadmin.admin import GenericAdminModelAdmin, GenericTabularInline
 
-class PagesInline(GenericTabularInline):
-    model = ...
+	class PagesInline(GenericTabularInline):
+    	model = ...
 
-class NavBarEntryAdmin(GenericAdminModelAdmin):
-    inlines = [PagesInline, ]
+	class NavBarEntryAdmin(GenericAdminModelAdmin):
+    	inlines = [PagesInline, ]
 
-...
-</pre>
+	...
 
 Note that you can't mix and match.  If you're going to use a generic inline,
 the class using it must inherit from `GenericAdminModelAdmin`.
@@ -80,10 +80,8 @@ the class using it must inherit from `GenericAdminModelAdmin`.
 Specific content types can be removed from the content type select list.
 Example:
 
-<pre>
-class NavBarEntryAdmin(GenericAdminModelAdmin):
-    content_type_blacklist = ('auth/group', 'auth/user', )
-</pre>
+	class NavBarEntryAdmin(GenericAdminModelAdmin):
+    	content_type_blacklist = ('auth/group', 'auth/user', )
 
 Note that this only happens on the client; there is no enforcement of the
 blacklist at the model level.
