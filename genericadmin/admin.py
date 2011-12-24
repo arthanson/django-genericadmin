@@ -37,11 +37,17 @@ class BaseGenericModelAdmin(object):
 
     def get_generic_relation_options(self):
         """ Return a dictionary of keywords that are fed to the get_generic_rel_list view """
-        return {'blacklist':self.get_blacklisted_relations()}
+        return {'blacklist':self.get_blacklisted_relations(), 'whitelist':self.get_whitelisted_relations()}
 
     def get_blacklisted_relations(self):
         try:
             return self.content_type_blacklist
+        except (AttributeError, ):
+            return ()
+
+    def get_whitelisted_relations(self):
+        try:
+            return self.content_type_whitelist
         except (AttributeError, ):
             return ()
 
