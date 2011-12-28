@@ -83,6 +83,14 @@ Example:
 	class NavBarEntryAdmin(GenericAdminModelAdmin):
     	content_type_blacklist = ('auth/group', 'auth/user', )
 
+## Whitelisting Content Types
+
+Specific content types that can be display from the content type select list.
+Example:
+
+	class NavBarEntryAdmin(GenericAdminModelAdmin):
+    	content_type_whitelist = ('auth/message', )
+
 Note that this only happens on the client; there is no enforcement of the
 blacklist at the model level.
 
