@@ -14,6 +14,8 @@ class BaseGenericModelAdmin(object):
     class Media:
         js = ()
 
+    content_type_lookups = {}
+    
     def __init__(self, model, admin_site):
         self.grappelli = False
         media = list(self.Media.js)
@@ -37,7 +39,9 @@ class BaseGenericModelAdmin(object):
 
     def get_generic_relation_options(self):
         """ Return a dictionary of keywords that are fed to the get_generic_rel_list view """
-        return {'blacklist':self.get_blacklisted_relations(), 'whitelist':self.get_whitelisted_relations()}
+        return {'url_params': self.content_type_lookups,
+                'blacklist': self.get_blacklisted_relations(),
+                'whitelist': self.get_whitelisted_relations()}
 
     def get_blacklisted_relations(self):
         try:

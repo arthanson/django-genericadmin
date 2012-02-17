@@ -94,3 +94,12 @@ Example:
 Note that this only happens on the client; there is no enforcement of the
 blacklist at the model level.
 
+## Lookup parameters by Content Type
+
+Supply extra lookup parameters per content type simliar to how 
+limit_choices_to works with raw id fields.
+Example:
+
+    class NavBarEntryAdmin(GenericAdminModelAdmin):
+        content_type_lookups = {'app.model': {'field': 'value'}
+
