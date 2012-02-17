@@ -6,7 +6,7 @@ except ImportError:
 from django.http import HttpResponse, HttpResponseNotAllowed
 from django.core import serializers
 from django.contrib.contenttypes.models import ContentType
-
+from django.contrib.admin.widgets import url_params_from_lookup_dict
 
 def get_obj(content_type_id, object_id):
     obj_dict = {
@@ -43,17 +43,20 @@ def generic_lookup(request):
     else:
         return HttpResponseNotAllowed(['GET'])
 
-def get_generic_rel_list(request, blacklist=(), whitelist=()):
+def get_generic_rel_list(request, blacklist=(), whitelist=(), url_params={}):
     if request.method == 'GET':
         obj_dict = {}
         for c in ContentType.objects.all().order_by('id'):
             val = u'%s/%s' % (c.app_label, c.model)
+            
+            params = url_params.get('%s.%s' % (c.app_label, c.model), {})
+            params = url_params_from_lookup_dict(params)
             if whitelist:
                 if val in whitelist:
-                    obj_dict[c.id] = val
+                    obj_dict[c.id] = (val, params)
             else:
                 if val not in blacklist:
-                    obj_dict[c.id] = val
+                    obj_dict[c.id] = (val, params)
 
         response = HttpResponse(mimetype='application/json')
         json.dump(obj_dict, response, ensure_ascii=False)
