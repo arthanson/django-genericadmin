@@ -46,7 +46,7 @@
 
                 if (this.value) {
                     if (that.url_array[this.value]) {
-                        key = that.url_array[this.value].split('/')[0];
+                        key = that.url_array[this.value][0].split('/')[0];
                         // create an array with unique elements
                         if ($.inArray(key, opt_keys) < 0) {
                             opt_keys.push(key);
@@ -77,9 +77,17 @@
             return contentTypeSelect;
         },
 
-
+        getLookupUrlParams: function(cID) {
+            var q = this.url_array[cID][1] || {};
+            var str = [];
+            for(var p in q)
+                str.push(encodeURIComponent(p) + "=" + encodeURIComponent(q[p]));
+            x = str.join("&");
+            url = x ? ("?" + x) : "";
+            return url
+        },
         getLookupUrl: function(cID) {
-            return '../../../' + this.url_array[cID] + '/';
+            return '../../../' + this.url_array[cID][0] + '/' + this.getLookupUrlParams(cID);
         },
         hideLookupLink: function() {
             $('#lookup_' + this.object_input.attr('id')).unbind().remove();
