@@ -4,7 +4,7 @@ except ImportError:
     import simplejson as json
     
 from django.http import HttpResponse, HttpResponseNotAllowed
-from django.core import serializers
+#from django.core import serializers
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.admin.widgets import url_params_from_lookup_dict
 
@@ -40,15 +40,13 @@ def generic_lookup(request):
         response = HttpResponse(mimetype='application/json')
         json.dump(objects, response, ensure_ascii=False)
         return response
-    else:
-        return HttpResponseNotAllowed(['GET'])
+    return HttpResponseNotAllowed(['GET'])
 
 def get_generic_rel_list(request, blacklist=(), whitelist=(), url_params={}):
     if request.method == 'GET':
         obj_dict = {}
         for c in ContentType.objects.all().order_by('id'):
             val = u'%s/%s' % (c.app_label, c.model)
-            
             params = url_params.get('%s.%s' % (c.app_label, c.model), {})
             params = url_params_from_lookup_dict(params)
             if whitelist:
@@ -61,5 +59,4 @@ def get_generic_rel_list(request, blacklist=(), whitelist=(), url_params={}):
         response = HttpResponse(mimetype='application/json')
         json.dump(obj_dict, response, ensure_ascii=False)
         return response
-    else:
-        return HttpResponseNotAllowed(['GET'])
+    return HttpResponseNotAllowed(['GET'])
