@@ -28,6 +28,7 @@
             var opt_keys = [];
             var opt_dict = {};
             var contentTypeSelect;
+            var outstring = '';
             
             // should return 3 items: ["id_ingredientlist_set", "2",
             // "content_type"]
@@ -36,12 +37,10 @@
             contentTypeSelect = $("[id$='content_type']", context).first();
             // contentTypeSelect = $('#id_content_type').first();
             var vars = $(this.object_input).attr("id").split('-');
-            
-            if (vars.length==6) {
-                contentTypeSelect = $('#' + vars[0] + '-' + vars[1] + '-' + vars[2] + '-' + vars[3] + '-' + vars[4] + '-content_type').first();
-            } else if (vars.length !== 1) {
-                contentTypeSelect = $('#' + vars[0] + '-' + vars[1] + '-content_type').first();
+            for (var x = 0; x < (vars.length-1); x++){
+                outstring+=vars[x]+'-'
             }
+            contentTypeSelect = $('#' + outstring + 'content_type').first();
 
             // polish the look of the select
             $(contentTypeSelect).find('option').each(function() {
