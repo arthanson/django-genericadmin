@@ -28,7 +28,8 @@
             var opt_keys = [];
             var opt_dict = {};
             var contentTypeSelect;
-
+            var outstring = '';
+            
             // should return 3 items: ["id_ingredientlist_set", "2",
             // "content_type"]
             // FIX:  a better way to specify this for generic inlines
@@ -36,9 +37,10 @@
             contentTypeSelect = $("[id$='content_type']", context).first();
             // contentTypeSelect = $('#id_content_type').first();
             var vars = $(this.object_input).attr("id").split('-');
-            if (vars.length !== 1) {
-                contentTypeSelect = $('#' + vars[0] + '-' + vars[1] + '-content_type').first();
+            for (var x = 0; x < (vars.length-1); x++){
+                outstring+=vars[x]+'-'
             }
+            contentTypeSelect = $('#' + outstring + 'content_type').first();
 
             // polish the look of the select
             $(contentTypeSelect).find('option').each(function() {
@@ -90,17 +92,19 @@
             return '../../../' + this.url_array[cID][0] + '/' + this.getLookupUrlParams(cID);
         },
         hideLookupLink: function() {
-            $('#lookup_' + this.object_input.attr('id')).unbind().remove();
-            $('#lookup_text').remove();
+            var this_id = this.object_input.attr('id');
+            $('#lookup_' + this_id).unbind().remove();
+            $('#lookup_text_' + this_id).remove();
         },
         showLookupLink: function() {
             var that = this;
             var url = this.getLookupUrl(this.cID);
-            var id = 'lookup_' + this.object_input.attr('id');
+            var this_id = this.object_input.attr('id');
+            var id = 'lookup_' + this_id;
 
             var link = '<a class="related-lookup" id="' + id + '" href="' + url + '">';
             link = link + '<img src="' + this.admin_media_url + 'img/admin/selector-search.gif" style="cursor: pointer; margin-left: 5px; margin-right: 10px;" width="16" height="16" alt="Lookup"></a>';
-            link = link + '<strong id="lookup_text" margin-left: 5px"></strong>';
+            link = link + '<strong id="lookup_text_'+ this_id +'" margin-left: 5px"></strong>';
 
             // insert link html after input element
             $(this.object_input).after(link);
@@ -143,7 +147,8 @@
             return function() {
                 // if (!that.object_input.value) { return } 
                 // bail if no input
-                $('#lookup_text').text('').text('loading...');
+                var this_id = that.object_input.attr('id');
+                $('#lookup_text_'+this_id).text('').text('loading...');
                 $.ajax({
                     url: that.obj_url,
                     dataType: 'json',
@@ -154,7 +159,7 @@
                     success: function(data) {
                         var item = data[0];
                         if (item && item.content_type_text && item.object_text) {
-                            $('#lookup_text').text(item.content_type_text + ': ' + item.object_text);
+                            $('#lookup_text_'+this_id).text(item.content_type_text + ': ' + item.object_text);
                             // run a callback to do other stuff like prepopulating url fields
                             // can't be done with normal django admin prepopulate
                             if (that.updateObjectDataCallback) {
@@ -180,8 +185,9 @@
             // install event handler for select
             $(that.object_select).change(function() {
                 // reset the object input to the associated select (this one)
-                that.object_input = $('#' + this.id.replace('content_type', 'object_id'));
-                // $(this).css('color', 'red'); // uncomment for testing
+                that.object_input = $('#' + this.id.replace('-content_type', '-object_id'));
+                
+                //(this).css('color', 'red'); // uncomment for testing
                 var link_id;
                 that.hideLookupLink();
                 // Set our objectId when the content_type is changed
