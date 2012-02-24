@@ -135,12 +135,12 @@ And here's how you'd set up your admin.py:
     
     class RelatedContentInline(GenericTabularInline):
         model = RelatedContent
-        ct_field = 'parent_content_type' # See below.*
-        ct_fk_field = 'parent_object_id' # See below.*
+        ct_field = 'parent_content_type' # See below.**
+        ct_fk_field = 'parent_object_id' # See below.**
         
     class WhateverModelAdmin(GenericAdminModelAdmin): # Super important!**
         inlines = [RelatedContentInline,]
         
-* By default `ct_field` and `ct_fk_field` will default to `content_type` and `object_id` respectively. `ct_field` and `ct_fk_field` are used to create the parent link from the inline to the model you are attaching it to (similar to how Django does this attachment using foreign keys with more conventional inlines). You could also leave this configuration out of your inline classes but, if you do that, I encourage you to change the model attributes from `parent_content_type` & `parent_object_id` to `child_content_type` & `child_object_id`. I say this because, when it comes time to make queries, you'll want to know which direction you're 'traversing' in.
+** By default `ct_field` and `ct_fk_field` will default to `content_type` and `object_id` respectively. `ct_field` and `ct_fk_field` are used to create the parent link from the inline to the model you are attaching it to (similar to how Django does this attachment using foreign keys with more conventional inlines). You could also leave this configuration out of your inline classes but, if you do that, I encourage you to change the model attributes from `parent_content_type` & `parent_object_id` to `child_content_type` & `child_object_id`. I say this because, when it comes time to make queries, you'll want to know which direction you're 'traversing' in.
 
-** Make sure that whatever the admin classes are utilizing these inlines are subclasses of `GenericAdminModelAdmin` from `django-genericadmin` or else they wont work.
+*** Make sure that whatever the admin classes are utilizing these inlines are subclasses of `GenericAdminModelAdmin` from `django-genericadmin` or else they wont work.
