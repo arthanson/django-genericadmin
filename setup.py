@@ -3,11 +3,11 @@ from distutils.core import setup
 
 setup(
     name='genericadmin',
-    version='0.2',
+    version='0.3',
     description="Adds support for generic relations within Django's admin interface.",
     author='Weston Nielson, Jan Schrewe',
     author_email='wnielson@gmail.com, jschrewe@googlemail.com',
-    url='http://bitbucket.org/knurpsburps/django-genericadmin/overview',
+    url='https://github.com/jschrewe/django-genericadmin',
     packages = ['genericadmin'],
     package_data={'genericadmin': ['static/genericadmin/js/*.js']},
     classifiers=[

@@ -1,14 +1,11 @@
 from django.contrib import admin
 from django.conf.urls.defaults import patterns, url
-from genericadmin.views import generic_lookup, get_generic_rel_list
 from django.conf import settings
-
-JS_PATH = getattr(settings, 'GENERICADMIN_JS', 'genericadmin/js/') 
-
-
-
 from django.contrib.contenttypes import generic
 
+from genericadmin.views import generic_lookup, get_generic_rel_list
+
+JS_PATH = getattr(settings, 'GENERICADMIN_JS', 'genericadmin/js/') 
 
 class BaseGenericModelAdmin(object):
     class Media:
@@ -19,11 +16,11 @@ class BaseGenericModelAdmin(object):
     def __init__(self, model, admin_site):
         self.grappelli = False
         media = list(self.Media.js)
-        if 'grappelli' in settings.INSTALLED_APPS:
-            media.append(JS_PATH + 'genericadmin-grappelli.js')
-            self.grappelli = True
-        if not self.grappelli:
-            media.append(JS_PATH + 'genericadmin.js')
+        #if 'grappelli' in settings.INSTALLED_APPS:
+        #    media.append(JS_PATH + 'genericadmin-grappelli.js')
+        #    self.grappelli = True
+        #if not self.grappelli:
+        media.append(JS_PATH + 'genericadmin.js')
         self.Media.js = tuple(media)
         super(BaseGenericModelAdmin, self).__init__(model, admin_site)
 

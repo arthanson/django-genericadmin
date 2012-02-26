@@ -105,7 +105,12 @@ Example:
 
 ## True Polymorphic Relationships
 
-`django-genericadmin` also provides a UI to easily manage a particularly useful model that, when used as an inline on another model, enables relations from any entry of any model to any other entry of any other model. And, because it has a generic relationship moving in both directions, it means it can be attached as an inline _to any model_ without having to create unique, individual foreign keys for each model you want to use it on.
+`django-genericadmin` also provides a UI to easily manage a particularly 
+useful model that, when used as an inline on another model, enables relations 
+from any entry of any model to any other entry of any other model. And, because 
+it has a generic relationship moving in both directions, it means it can be 
+attached as an inline _to any model_ without having to create unique, individual 
+foreign keys for each model you want to use it on.
 
 Here's an example of a polymorphic model:
 
@@ -135,13 +140,23 @@ And here's how you'd set up your admin.py:
     
     class RelatedContentInline(GenericTabularInline):
         model = RelatedContent
-        ct_field = 'parent_content_type' # See below.**
-        ct_fk_field = 'parent_object_id' # See below.**
+        ct_field = 'parent_content_type' # See below (1).
+        ct_fk_field = 'parent_object_id' # See below (1).
         
-    class WhateverModelAdmin(GenericAdminModelAdmin): # Super important!***
+    class WhateverModelAdmin(GenericAdminModelAdmin): # Super important! See below (2).
         content_type_whitelist = ('app/model', 'app2/model2' ) # Add white/black lists on this class
         inlines = [RelatedContentInline,]
         
-** By default `ct_field` and `ct_fk_field` will default to `content_type` and `object_id` respectively. `ct_field` and `ct_fk_field` are used to create the parent link from the inline to the model you are attaching it to (similar to how Django does this attachment using foreign keys with more conventional inlines). You could also leave this configuration out of your inline classes but, if you do that, I encourage you to change the model attributes from `parent_content_type` & `parent_object_id` to `child_content_type` & `child_object_id`. I say this because, when it comes time to make queries, you'll want to know which direction you're 'traversing' in.
+(1) By default `ct_field` and `ct_fk_field` will default to `content_type` and 
+`object_id` respectively. `ct_field` and `ct_fk_field` are used to create the 
+parent link from the inline to the model you are attaching it to (similar to 
+how Django does this attachment using foreign keys with more conventional 
+inlines). You could also leave this configuration out of your inline classes 
+but, if you do that, I encourage you to change the model attributes from 
+`parent_content_type` & `parent_object_id` to `child_content_type` & 
+`child_object_id`. I say this because, when it comes time to make queries, 
+you'll want to know which direction you're 'traversing' in.
 
-*** Make sure that whatever the admin classes are utilizing these inlines are subclasses of `GenericAdminModelAdmin` from `django-genericadmin` or else the handy-dandy javascript-utilizing interface won't work as intended.
+(2) Make sure that whatever the admin classes are utilizing these inlines are 
+subclasses of `GenericAdminModelAdmin` from `django-genericadmin` or else the 
+handy-dandy javascript-utilizing interface won't work as intended.

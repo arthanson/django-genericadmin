@@ -4,7 +4,6 @@ except ImportError:
     import simplejson as json
     
 from django.http import HttpResponse, HttpResponseNotAllowed
-#from django.core import serializers
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.admin.widgets import url_params_from_lookup_dict
 
