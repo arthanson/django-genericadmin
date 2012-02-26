@@ -4,6 +4,8 @@
     updated by Jan Schrewe (jschrewe@googlemail.com)
 
     updated by Troy Melhase (troy.melhase@gmail.com)
+    
+	updated by Jonathan Ellenberger (jon@respondcreate.com)
 
  */
  (function($) {
