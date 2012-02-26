@@ -37,11 +37,13 @@
             contentTypeSelect = $("[id$='content_type']", context).first();
             // contentTypeSelect = $('#id_content_type').first();
             var vars = $(this.object_input).attr("id").split('-');
-            for (var x = 0; x < (vars.length-1); x++){
-                outstring+=vars[x]+'-'
+            if (vars.length !== 1) {
+                for (var x = 0; x < (vars.length-1); x++){
+                    outstring+=vars[x]+'-'
+                }
+                contentTypeSelect = $('#' + outstring + 'content_type').first();
             }
-            contentTypeSelect = $('#' + outstring + 'content_type').first();
-
+            
             // polish the look of the select
             $(contentTypeSelect).find('option').each(function() {
                 var key;
