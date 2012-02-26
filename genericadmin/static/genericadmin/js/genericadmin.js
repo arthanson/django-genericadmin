@@ -39,9 +39,12 @@
             var vars = $(this.object_input).attr("id").split('-');
             if (vars.length !== 1) {
                 for (var x = 0; x < (vars.length-1); x++){
-                    outstring+=vars[x]+'-'
+                    outstring+=vars[x];
+                    if (x < (vars.length-2)){
+                        outstring+='-';
+                    }
                 }
-                contentTypeSelect = $('#' + outstring + 'content_type').first();
+                contentTypeSelect = $('#' + outstring + '-content_type').first();
             }
             
             // polish the look of the select
@@ -187,7 +190,12 @@
             // install event handler for select
             $(that.object_select).change(function() {
                 // reset the object input to the associated select (this one)
-                that.object_input = $('#' + this.id.replace('-content_type', '-object_id'));
+                var id_split = this.id.split('-');
+                if (id_split.length !== 1) {
+                    that.object_input = $('#' + this.id.replace('-content_type', '-object_id'));
+                } else {
+                    that.object_input = $('#' + this.id.replace('content_type', 'object_id'));
+                }
                 
                 //(this).css('color', 'red'); // uncomment for testing
                 var link_id;
