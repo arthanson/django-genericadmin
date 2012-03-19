@@ -110,7 +110,7 @@
             var id = 'lookup_' + this_id;
 
             var link = '<a class="related-lookup" id="' + id + '" href="' + url + '">';
-            link = link + '<img src="' + this.admin_media_url + 'img/admin/selector-search.gif" style="cursor: pointer; margin-left: 5px; margin-right: 10px;" width="16" height="16" alt="Lookup"></a>';
+            link = link + '<img src="' + this.admin_media_url + 'img/selector-search.gif" style="cursor: pointer; margin-left: 5px; margin-right: 10px;" width="16" height="16" alt="Lookup"></a>';
             link = link + '<strong id="lookup_text_'+ this_id +'" margin-left: 5px"></strong>';
 
             // insert link html after input element
