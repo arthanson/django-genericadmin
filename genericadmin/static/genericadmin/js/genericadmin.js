@@ -4,8 +4,8 @@
     updated by Jan Schrewe (jschrewe@googlemail.com)
 
     updated by Troy Melhase (troy.melhase@gmail.com)
-    
-	updated by Jonathan Ellenberger (jon@respondcreate.com)
+
+    updated by Jonathan Ellenberger (jon@respondcreate.com)
 
  */
  (function($) {
@@ -31,7 +31,7 @@
             var opt_dict = {};
             var contentTypeSelect;
             var outstring = '';
-            
+
             // should return 3 items: ["id_ingredientlist_set", "2",
             // "content_type"]
             // FIX:  a better way to specify this for generic inlines
@@ -48,7 +48,7 @@
                 }
                 contentTypeSelect = $('#' + outstring + '-content_type').first();
             }
-            
+
             // polish the look of the select
             $(contentTypeSelect).find('option').each(function() {
                 var key;
@@ -93,7 +93,7 @@
                 str.push(encodeURIComponent(p) + "=" + encodeURIComponent(q[p]));
             x = str.join("&");
             url = x ? ("?" + x) : "";
-            return url
+            return url;
         },
         getLookupUrl: function(cID) {
             return '../../../' + this.url_array[cID][0] + '/' + this.getLookupUrlParams(cID);
@@ -101,7 +101,8 @@
         hideLookupLink: function() {
             var this_id = this.object_input.attr('id');
             $('#lookup_' + this_id).unbind().remove();
-            $('#lookup_text_' + this_id).remove();
+            $('#lookup_text_' + this_id+' a').text('');
+            $('#lookup_text_' + this_id+' span').text('');
         },
         showLookupLink: function() {
             var that = this;
@@ -111,7 +112,7 @@
 
             var link = '<a class="related-lookup" id="' + id + '" href="' + url + '">';
             link = link + '<img src="' + this.admin_media_url + 'img/selector-search.gif" style="cursor: pointer; margin-left: 5px; margin-right: 10px;" width="16" height="16" alt="Lookup"></a>';
-            link = link + '<strong id="lookup_text_'+ this_id +'" margin-left: 5px"></strong>';
+            link = link + '<strong id="lookup_text_'+ this_id +'" margin-left: 5px"><a href="#"></a><span></span></strong>';
 
             // insert link html after input element
             $(this.object_input).after(link);
@@ -121,7 +122,7 @@
         pollInputChange: function(window) {
             var that = this;
             var interval_id = setInterval(function() {
-                if (window.closed == true) {
+                if (window.closed === true) {
                     clearInterval(interval_id);
                     that.updateObjectData()();
                     return true;
@@ -152,10 +153,10 @@
         updateObjectData: function() {
             var that = this;
             return function() {
-                // if (!that.object_input.value) { return } 
+                // if (!that.object_input.value) { return }
                 // bail if no input
                 var this_id = that.object_input.attr('id');
-                $('#lookup_text_'+this_id).text('').text('loading...');
+                $('#lookup_text_'+this_id+' span').text('').text('loading...');
                 $.ajax({
                     url: that.obj_url,
                     dataType: 'json',
@@ -166,7 +167,12 @@
                     success: function(data) {
                         var item = data[0];
                         if (item && item.content_type_text && item.object_text) {
-                            $('#lookup_text_'+this_id).text(item.content_type_text + ': ' + item.object_text);
+                          console.log ("ITEM", item);
+                            var url = that.getLookupUrl(that.cID);
+                            $('#lookup_text_' + this_id + ' span').text('');
+                            $('#lookup_text_' + this_id + ' a')
+                                .text(item.content_type_text + ': ' + item.object_text)
+                                .attr('href', url + item.object_id)
                             // run a callback to do other stuff like prepopulating url fields
                             // can't be done with normal django admin prepopulate
                             if (that.updateObjectDataCallback) {
@@ -198,7 +204,7 @@
                 } else {
                     that.object_input = $('#' + this.id.replace('content_type', 'object_id'));
                 }
-                
+
                 //(this).css('color', 'red'); // uncomment for testing
                 var link_id;
                 that.hideLookupLink();
@@ -220,7 +226,10 @@
 
             // Bind to the onblur of the object_id input.
             $(this.object_input).blur(this.updateObjectData());
-        },
+
+            // Fire once for initial link.
+            this.updateObjectData()();
+        }
     };
 
 
