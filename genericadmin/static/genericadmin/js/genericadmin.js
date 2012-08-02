@@ -111,7 +111,7 @@
               link = '<a class="related-lookup" id="' + id + '" href="' + url + '">';
 
             link = link + '<img src="' + this.admin_media_url + 'img/selector-search.gif" style="cursor: pointer; margin-left: 5px; margin-right: 10px;" width="16" height="16" alt="Lookup"></a>';
-            link = link + '<strong id="lookup_text_'+ this_id +'" margin-left: 5px"><a href="#"></a><span></span></strong>';
+            link = link + '<strong id="lookup_text_'+ this_id +'" margin-left: 5px"><a target="_new" href="#"></a><span></span></strong>';
 
             // insert link html after input element
             $(this.object_input).after(link);
