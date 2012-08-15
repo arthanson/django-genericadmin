@@ -151,13 +151,13 @@
             return function() {
                 // if (!that.object_input.value) { return }
                 // bail if no input
-                var this_id = that.object_input.attr('id');
+                var this_id = $(that.object_input).attr('id');
                 $('#lookup_text_' + this_id + ' span').text('loading...');
                 $.ajax({
                     url: that.obj_url,
                     dataType: 'json',
                     data: {
-                        object_id: that.object_input.attr('value'),
+                        object_id: $(that.object_input).attr('value'),
                         content_type: that.cID
                     },
                     success: function(data) {
