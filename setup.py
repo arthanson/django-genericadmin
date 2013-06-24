@@ -2,8 +2,8 @@
 from distutils.core import setup
 
 setup(
-    name='genericadmin',
-    version='0.3',
+    name='django-genericadmin',
+    version='0.4',
     description="Adds support for generic relations within Django's admin interface.",
     author='Weston Nielson, Jan Schrewe',
     author_email='wnielson@gmail.com, jschrewe@googlemail.com',

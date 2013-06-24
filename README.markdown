@@ -10,11 +10,13 @@ The rest is done by grappelli.
 To install add it to your `INSTALLED_APPS` setting. There is no need to
 run `manage.py syncdb` because _django-genericadmin_ does not have any models.
 
-    INSTALLED_APPS = (
-       ...
-       'genericadmin',
-       ...
-    )
+```python
+INSTALLED_APPS = (
+   ...
+   'genericadmin',
+   ...
+)
+```
 
 If you are using the staticfiles app, then run `manage.py collectstatic` and you should be 
 good to go. 
@@ -30,19 +32,23 @@ To use _django-genericadmin_ your model admin class must inherit from
 
 So a model admin like
 
-    class NavBarEntryAdmin(admin.ModelAdmin):
-        pass
+```python
+class NavBarEntryAdmin(admin.ModelAdmin):
+    pass
 
-    admin.site.register(NavBarEntry, NavBarEntryAdmin)
+admin.site.register(NavBarEntry, NavBarEntryAdmin)
+```
 
 becomes
 
-    from genericadmin.admin import GenericAdminModelAdmin
+```python
+from genericadmin.admin import GenericAdminModelAdmin
 
-    class NavBarEntryAdmin(GenericAdminModelAdmin):
-        pass
+class NavBarEntryAdmin(GenericAdminModelAdmin):
+    pass
 
-    admin.site.register(NavBarEntry, NavBarEntryAdmin)
+admin.site.register(NavBarEntry, NavBarEntryAdmin)
+```
 
 That's it.
 
@@ -52,25 +58,29 @@ That's it.
 To use _django-genericadmin_ with admin inlines, your models must inherit from 
 `GenericAdminModelAdmin` as described above:
 
-	from genericadmin.admin import GenericAdminModelAdmin
+```python
+from genericadmin.admin import GenericAdminModelAdmin
 
-	class NavBarEntryAdmin(GenericAdminModelAdmin):
-    	pass
+class NavBarEntryAdmin(GenericAdminModelAdmin):
+   	pass
 
-	admin.site.register(NavBarEntry, NavBarEntryAdmin)
+admin.site.register(NavBarEntry, NavBarEntryAdmin)
+```
 
 Additionally the inline classes must inherit from either `GenericStackedInline`
 or `GenericTabularInline`:
 
-	from genericadmin.admin import GenericAdminModelAdmin, GenericTabularInline
+```python
+from genericadmin.admin import GenericAdminModelAdmin, GenericTabularInline
 
-	class PagesInline(GenericTabularInline):
-    	model = ...
+class PagesInline(GenericTabularInline):
+   	model = ...
 
-	class NavBarEntryAdmin(GenericAdminModelAdmin):
-    	inlines = [PagesInline, ]
+class NavBarEntryAdmin(GenericAdminModelAdmin):
+   	inlines = [PagesInline, ]
 
-	...
+...
+```
 
 Note that you can't mix and match.  If you're going to use a generic inline,
 the class using it must inherit from `GenericAdminModelAdmin`.
@@ -80,16 +90,20 @@ the class using it must inherit from `GenericAdminModelAdmin`.
 Specific content types can be removed from the content type select list.
 Example:
 
-	class NavBarEntryAdmin(GenericAdminModelAdmin):
-    	content_type_blacklist = ('auth/group', 'auth/user', )
+```python
+class NavBarEntryAdmin(GenericAdminModelAdmin):
+   	content_type_blacklist = ('auth/group', 'auth/user', )
+```
 
 ## Whitelisting Content Types
 
 Specific content types that can be display from the content type select list.
 Example:
 
-	class NavBarEntryAdmin(GenericAdminModelAdmin):
-    	content_type_whitelist = ('auth/message', )
+```python
+class NavBarEntryAdmin(GenericAdminModelAdmin):
+   	content_type_whitelist = ('auth/message', )
+```
 
 Note that this only happens on the client; there is no enforcement of the
 blacklist at the model level.
@@ -100,8 +114,10 @@ Supply extra lookup parameters per content type similar to how
 limit_choices_to works with raw id fields.
 Example:
 
-    class NavBarEntryAdmin(GenericAdminModelAdmin):
-        content_type_lookups = {'app.model': {'field': 'value'}
+```python
+class NavBarEntryAdmin(GenericAdminModelAdmin):
+    content_type_lookups = {'app.model': {'field': 'value'}
+```
 
 ## True Polymorphic Relationships
 
@@ -114,38 +130,42 @@ foreign keys for each model you want to use it on.
 
 Here's an example of a polymorphic model:
 
-    from django.db import models
-    from django.contrib.contenttypes.models import ContentType
-    from django.contrib.contenttypes import generic
+```python
+from django.db import models
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes import generic
     
-    class RelatedContent(models.Model):
-        """
-        Relates any one entry to another entry irrespective of their individual models.
-        """
-        content_type = models.ForeignKey(ContentType)
-        object_id = models.PositiveIntegerField()
-        content_object = generic.GenericForeignKey('content_type', 'object_id')
+class RelatedContent(models.Model):
+    """
+    Relates any one entry to another entry irrespective of their individual models.
+    """
+    content_type = models.ForeignKey(ContentType)
+    object_id = models.PositiveIntegerField()
+    content_object = generic.GenericForeignKey('content_type', 'object_id')
 
-        parent_content_type = models.ForeignKey(ContentType, related_name="parent_test_link")
-        parent_object_id = models.PositiveIntegerField()
-        parent_content_object = generic.GenericForeignKey('parent_content_type', 'parent_object_id')
+    parent_content_type = models.ForeignKey(ContentType, related_name="parent_test_link")
+    parent_object_id = models.PositiveIntegerField()
+    parent_content_object = generic.GenericForeignKey('parent_content_type', 'parent_object_id')
 
-        def __unicode__(self):
-            return "%s: %s" % (self.content_type.name, self.content_object)
+    def __unicode__(self):
+        return "%s: %s" % (self.content_type.name, self.content_object)
+```
 
 And here's how you'd set up your admin.py:
 
-    from whateverapp.models import RelatedContent
-    from genericadmin.admin import GenericAdminModelAdmin, GenericTabularInline
+```python
+from whateverapp.models import RelatedContent
+from genericadmin.admin import GenericAdminModelAdmin, GenericTabularInline
     
-    class RelatedContentInline(GenericTabularInline):
-        model = RelatedContent
-        ct_field = 'parent_content_type' # See below (1).
-        ct_fk_field = 'parent_object_id' # See below (1).
+class RelatedContentInline(GenericTabularInline):
+    model = RelatedContent
+    ct_field = 'parent_content_type' # See below (1).
+    ct_fk_field = 'parent_object_id' # See below (1).
         
-    class WhateverModelAdmin(GenericAdminModelAdmin): # Super important! See below (2).
-        content_type_whitelist = ('app/model', 'app2/model2' ) # Add white/black lists on this class
-        inlines = [RelatedContentInline,]
+class WhateverModelAdmin(GenericAdminModelAdmin): # Super important! See below (2).
+    content_type_whitelist = ('app/model', 'app2/model2' ) # Add white/black lists on this class
+    inlines = [RelatedContentInline,]
+```
         
 (1) By default `ct_field` and `ct_fk_field` will default to `content_type` and 
 `object_id` respectively. `ct_field` and `ct_fk_field` are used to create the 
