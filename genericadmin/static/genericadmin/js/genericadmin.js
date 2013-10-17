@@ -11,46 +11,18 @@
  (function($) {
     var GenericAdmin = {
         url_array: null,
+        fields: null,
         obj_url: "../obj/",
         admin_media_url: window.__admin_media_prefix__,
-        generics_list_url: '../get-generic-rel-list/',
-        loadUrlArray: function() {
-            var that = this;
-            $.ajax({
-                url: this.generics_list_url,
-                dataType: 'json',
-                success: function(data) {
-                    that.url_array = data;
-                },
-                async: false
-            });
-        },
-        prepareSelect: function(elem) {
-            var that = this;
-            var opt_keys = [];
-            var opt_dict = {};
-            var contentTypeSelect;
-            var outstring = '';
-
-            // should return 3 items: ["id_ingredientlist_set", "2",
-            // "content_type"]
-            // FIX:  a better way to specify this for generic inlines
-            var context = $(elem).parents('fieldset');
-            contentTypeSelect = $("[id$='content_type']", context).first();
-            // contentTypeSelect = $('#id_content_type').first();
-            var vars = $(this.object_input).attr("id").split('-');
-            if (vars.length !== 1) {
-                for (var x = 0; x < (vars.length-1); x++){
-                    outstring+=vars[x];
-                    if (x < (vars.length-2)){
-                        outstring+='-';
-                    }
-                }
-                contentTypeSelect = $('#' + outstring + '-content_type').first();
-            }
+        
+        prepareSelect: function(select) {
+            var that = this,
+                opt_keys = [],
+                opt_dict = {},
+                opt_group_css = 'style="font-style:normal; font-weight:bold; color:#999; padding-left: 2px;"';
 
             // polish the look of the select
-            $(contentTypeSelect).find('option').each(function() {
+            select.find('option').each(function() {
                 var key;
 
                 if (this.value) {
@@ -72,7 +44,6 @@
 
             opt_keys = opt_keys.sort();
 
-            var opt_group_css = 'style="font-style:normal; font-weight:bold; color:#999; padding-left: 2px;"';
             $.each(opt_keys, function(index, key) {
                 var opt_group = $('<optgroup label="' + key + '" ' + opt_group_css + '></optgroup>');
                 $.each(opt_dict[key], function(index, value) {
@@ -80,44 +51,58 @@
                         'color': '#000'
                     });
                 });
-                $(contentTypeSelect).append(opt_group);
+                select.append(opt_group);
             });
 
-            return contentTypeSelect;
+            return select;
         },
 
         getLookupUrlParams: function(cID) {
-          var q = this.url_array[cID][1] || {}, str = [];
-            for(var p in q)
+            var q = this.url_array[cID][1] || {}, 
+                str = [];
+            for(var p in q) {
                 str.push(encodeURIComponent(p) + "=" + encodeURIComponent(q[p]));
+            }
             x = str.join("&");
             url = x ? ("?" + x) : "";
             return url;
         },
+        
         getLookupUrl: function(cID) {
             return '../../../' + this.url_array[cID][0] + '/' + this.getLookupUrlParams(cID);
         },
-        hideLookupLink: function() {
-            var this_id = this.object_input.attr('id');
-            $('#lookup_' + this_id).unbind().remove();
-            $('#lookup_text_' + this_id+' a').text('');
-            $('#lookup_text_' + this_id+' span').text('');
+        
+        getFkId: function() {
+            return 'id_' + this.fields["fk_field"];
         },
+        
+        getCtId: function() {
+            return 'id_' + this.fields["ct_field"];
+        },
+        
+        hideLookupLink: function() {
+            var this_id = this.getFkId();
+            $('#lookup_' + this_id).unbind().remove();
+            $('#lookup_text_' + this_id + ' a').text('');
+            $('#lookup_text_' + this_id + ' span').text('');
+        },
+        
         showLookupLink: function() {
-          var that = this,
-              url = this.getLookupUrl(this.cID),
-              this_id = this.object_input.attr('id'),
-              id = 'lookup_' + this_id,
-              link = '<a class="related-lookup" id="' + id + '" href="' + url + '">';
-
+            var that = this,
+                url = this.getLookupUrl(this.cID),
+                this_id = this.getFkId(),
+                id = 'lookup_' + this_id,
+                link = '<a class="related-lookup" id="' + id + '" href="' + url + '">';
+                
             link = link + '<img src="' + this.admin_media_url + 'img/selector-search.gif" style="cursor: pointer; margin-left: 5px; margin-right: 10px;" width="16" height="16" alt="Lookup"></a>';
             link = link + '<strong id="lookup_text_'+ this_id +'" margin-left: 5px"><a target="_new" href="#"></a><span></span></strong>';
 
             // insert link html after input element
-            $(this.object_input).after(link);
+            this.object_input.after(link);
 
             return id;
         },
+        
         pollInputChange: function(window) {
             var that = this,
                 interval_id = setInterval(function() {
@@ -129,9 +114,11 @@
                 },
                 150);
         },
+        
         popRelatedObjectLookup: function(link) {
-            var name = link.id.replace(/^lookup_/, ''), href, win;
-            name = id_to_windowname(name);
+            var name = id_to_windowname(this.getFkId()), 
+                href, 
+                win;
 
             if (link.href.search(/\?/) >= 0) {
                 href = link.href + '&pop=1';
@@ -146,18 +133,22 @@
             win.focus();
             return false;
         },
+        
         updateObjectData: function() {
             var that = this;
             return function() {
-                // if (!that.object_input.value) { return }
-                // bail if no input
-                var this_id = $(that.object_input).attr('id');
+                var value = that.object_input.attr('value');
+                
+                if (!value) { 
+                    return 
+                }
+                var this_id = that.getFkId();
                 $('#lookup_text_' + this_id + ' span').text('loading...');
                 $.ajax({
                     url: that.obj_url,
                     dataType: 'json',
                     data: {
-                        object_id: $(that.object_input).attr('value'),
+                        object_id: value,
                         content_type: that.cID
                     },
                     success: function(data) {
@@ -174,6 +165,8 @@
                             if (that.updateObjectDataCallback) {
                                 that.updateObjectDataCallback(item);
                             }
+                        } else {
+                            $('#lookup_text_' + this_id + ' span').text('');
                         }
                     }
                 });
@@ -181,27 +174,22 @@
         },
 
 
-        installAdmin: function(elem) {
+        installAdmin: function(fields, url_array) {
             var that = this;
-            // initialize the url array
-            that.loadUrlArray();
-            // store the base element
-            that.object_input = elem;
 
+            this.url_array = url_array;
+            this.fields = fields;
+            
+            // store the base element
+            this.object_input = $("#" + this.getFkId());
+            
             // find the select we need to change
-            that.object_select = that.prepareSelect(elem);
+            this.object_select = this.prepareSelect($("#" + this.getCtId()));
 
             // install event handler for select
-            $(that.object_select).change(function() {
+            this.object_select.change(function() {
                 // reset the object input to the associated select (this one)
-                var id_split = this.id.split('-'),
-                    link_id;
-
-                if (id_split.length !== 1) {
-                    that.object_input = $('#' + this.id.replace('-content_type', '-object_id'));
-                } else {
-                    that.object_input = $('#' + this.id.replace('content_type', 'object_id'));
-                }
+                var link_id;
 
                 //(this).css('color', 'red'); // uncomment for testing
                 that.hideLookupLink();
@@ -210,19 +198,19 @@
                     that.cID = this.value;
                     link_id = that.showLookupLink();
                     $('#' + link_id).click(function(e) {
+                        e.preventDefault()
                         that.popRelatedObjectLookup(this);
-                        return false;
                     });
                 }
             });
 
             // fire change event if something is already selected
-            if ($(this.object_select).val()) {
-                $(this.object_select).trigger('change');
+            if (this.object_select.val()) {
+                this.object_select.trigger('change');
             }
 
             // Bind to the onblur of the object_id input.
-            $(this.object_input).blur(this.updateObjectData());
+            this.object_input.blur(that.updateObjectData());
 
             // Fire once for initial link.
             this.updateObjectData()();
@@ -232,8 +220,16 @@
 
 
     $(document).ready(function() {
-        $("[id$='object_id']").each(function(i, e) {
-            $.extend({}, GenericAdmin).installAdmin(this);
+        $.ajax({
+            url: '../genericadmin-init/',
+            dataType: 'json',
+            success: function(data) {
+                var url_array = data["url_array"],
+                    ct_fields = data["fields"];
+                for (var i = 0; i < ct_fields.length; i++) {
+                    $.extend({}, GenericAdmin).installAdmin(ct_fields[i], url_array);
+                }
+            }
         });
     });
 } (django.jQuery));

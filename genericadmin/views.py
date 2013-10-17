@@ -45,7 +45,7 @@ def generic_lookup(request):
         return response
     return HttpResponseNotAllowed(['GET'])
 
-def get_generic_rel_list(request, blacklist=(), whitelist=(), url_params={}):
+def genericadmin_js_init(request, blacklist=(), whitelist=(), url_params={}, generic_fields=[]):
     if request.method == 'GET':
         obj_dict = {}
         for c in ContentType.objects.all().order_by('id'):
@@ -58,8 +58,12 @@ def get_generic_rel_list(request, blacklist=(), whitelist=(), url_params={}):
             else:
                 if val not in blacklist:
                     obj_dict[c.id] = (val, params)
-
+        
+        data = {
+            'url_array': obj_dict,
+            'fields': generic_fields,
+        }
         response = HttpResponse(mimetype='application/json')
-        json.dump(obj_dict, response, ensure_ascii=False)
+        json.dump(data, response, ensure_ascii=False)
         return response
     return HttpResponseNotAllowed(['GET'])
