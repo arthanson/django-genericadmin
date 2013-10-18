@@ -3,9 +3,11 @@ try:
 except ImportError: 
     import simplejson as json
     
-from django.http import HttpResponse, HttpResponseNotAllowed
+from django.http import HttpResponse, HttpResponseNotAllowed, Http404
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.admin.widgets import url_params_from_lookup_dict
+from django.utils.text import capfirst
+from django.core.exceptions import ObjectDoesNotExist
 try:
     from django.utils.encoding import force_text 
 except ImportError:
@@ -18,13 +20,13 @@ def get_obj(content_type_id, object_id):
     }
     
     content_type = ContentType.objects.get(pk=content_type_id)
-    obj_dict["content_type_text"] = force_text(content_type)
+    obj_dict["content_type_text"] = capfirst(force_text(content_type))
     
     try:
         obj = content_type.get_object_for_this_type(pk=object_id)
-        obj_dict["object_text"] = force_text(obj)
-    except:
-        obj_dict["object_text"] = ""
+        obj_dict["object_text"] = capfirst(force_text(obj))
+    except ObjectDoesNotExist:
+        raise Http404
 
     return obj_dict
 

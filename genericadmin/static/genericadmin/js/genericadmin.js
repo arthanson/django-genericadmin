@@ -19,37 +19,40 @@
             var that = this,
                 opt_keys = [],
                 opt_dict = {},
+                no_value,
                 opt_group_css = 'style="font-style:normal; font-weight:bold; color:#999; padding-left: 2px;"';
 
             // polish the look of the select
             select.find('option').each(function() {
-                var key;
+                var key, opt;
 
                 if (this.value) {
                     if (that.url_array[this.value]) {
                         key = that.url_array[this.value][0].split('/')[0];
-                        // create an array with unique elements
+                        
+                        opt = $(this).clone();
+                        opt.text(that.capFirst(opt.text()));
                         if ($.inArray(key, opt_keys) < 0) {
                             opt_keys.push(key);
                             // if it's the first time in array
                             // it's the first time in dict
-                            opt_dict[key] = [$(this).clone()];
+                            opt_dict[key] = [opt];
                         } else {
-                            opt_dict[key].push($(this).clone());
+                            opt_dict[key].push(opt);
                         }
                     }
-                    $(this).remove();
+                } else {
+                    no_value = $(this).clone();
                 }
             });
-
+            select.empty().append(no_value);
+            
             opt_keys = opt_keys.sort();
 
             $.each(opt_keys, function(index, key) {
-                var opt_group = $('<optgroup label="' + key + '" ' + opt_group_css + '></optgroup>');
+                var opt_group = $('<optgroup label="' + that.capFirst(key) + '" ' + opt_group_css + '></optgroup>');
                 $.each(opt_dict[key], function(index, value) {
-                    opt_group.append(value).css({
-                        'color': '#000'
-                    });
+                    opt_group.append(value).css('color', '#000');
                 });
                 select.append(opt_group);
             });
@@ -80,11 +83,15 @@
             return 'id_' + this.fields.ct_field;
         },
         
+        capFirst: function(string) {
+            return string.charAt(0).toUpperCase() + string.slice(1);
+        },
+        
         hideLookupLink: function() {
             var this_id = this.getFkId();
             $('#lookup_' + this_id).unbind().remove();
-            $('#lookup_text_' + this_id + ' a').text('');
-            $('#lookup_text_' + this_id + ' span').text('');
+            $('#lookup_text_' + this_id + ' a').remove();
+            $('#lookup_text_' + this_id + ' span').remove();
         },
         
         showLookupLink: function() {
@@ -137,7 +144,7 @@
         updateObjectData: function() {
             var that = this;
             return function() {
-                var value = that.object_input.attr('value');
+                var value = that.object_input.val();
                 
                 if (!value) { 
                     return 
@@ -154,7 +161,6 @@
                     success: function(item) {
                         if (item && item.content_type_text && item.object_text) {
                             var url = that.getLookupUrl(that.cID);
-                            $('#lookup_text_' + this_id + ' span').text('');
                             $('#lookup_text_' + this_id + ' a')
                                 .text(item.content_type_text + ': ' + item.object_text)
                                 .attr('href', url + item.object_id);
@@ -164,8 +170,16 @@
                             if (that.updateObjectDataCallback) {
                                 that.updateObjectDataCallback(item);
                             }
+                        }
+                        $('#lookup_text_' + this_id + ' span').text('');
+                    },
+                    error: function(xhr, status, error) {
+                        $('#lookup_text_' + this_id + ' span').text('')
+                            .html('Error: ' + xhr.status + ' &ndash; ' + that.capFirst(xhr.statusText.toLowerCase()));
+                        if (xhr.status === 404) {
+                            that.object_input.val('');
                         } else {
-                            $('#lookup_text_' + this_id + ' span').text('');
+                            $('#lookup_text_' + this_id + ' span').css('color', '#f00');
                         }
                     }
                 });
@@ -196,7 +210,7 @@
                     that.cID = this.value;
                     link_id = that.showLookupLink();
                     $('#' + link_id).click(function(e) {
-                        e.preventDefault()
+                        e.preventDefault();
                         that.popRelatedObjectLookup(this);
                     });
                 }
