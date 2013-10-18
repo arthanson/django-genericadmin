@@ -12,7 +12,7 @@
     var GenericAdmin = {
         url_array: null,
         fields: null,
-        obj_url: "../obj/",
+        obj_url: "../obj-data/",
         admin_media_url: window.__admin_media_prefix__,
         
         prepareSelect: function(select) {
@@ -73,11 +73,11 @@
         },
         
         getFkId: function() {
-            return 'id_' + this.fields["fk_field"];
+            return 'id_' + this.fields.fk_field;
         },
         
         getCtId: function() {
-            return 'id_' + this.fields["ct_field"];
+            return 'id_' + this.fields.ct_field;
         },
         
         hideLookupLink: function() {
@@ -151,8 +151,7 @@
                         object_id: value,
                         content_type: that.cID
                     },
-                    success: function(data) {
-                        var item = data[0];
+                    success: function(item) {
                         if (item && item.content_type_text && item.object_text) {
                             var url = that.getLookupUrl(that.cID);
                             $('#lookup_text_' + this_id + ' span').text('');
@@ -172,7 +171,6 @@
                 });
             };
         },
-
 
         installAdmin: function(fields, url_array) {
             var that = this;
@@ -217,15 +215,13 @@
         }
     };
 
-
-
     $(document).ready(function() {
         $.ajax({
             url: '../genericadmin-init/',
             dataType: 'json',
             success: function(data) {
-                var url_array = data["url_array"],
-                    ct_fields = data["fields"];
+                var url_array = data.url_array,
+                    ct_fields = data.fields;
                 for (var i = 0; i < ct_fields.length; i++) {
                     $.extend({}, GenericAdmin).installAdmin(ct_fields[i], url_array);
                 }

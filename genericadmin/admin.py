@@ -15,7 +15,6 @@ class BaseGenericModelAdmin(object):
     generic_fk_fields = []
     
     def __init__(self, model, admin_site):
-        self.grappelli = False
         try:
             media = list(self.Media.js)
         except:
@@ -42,7 +41,7 @@ class BaseGenericModelAdmin(object):
         base_urls = super(BaseGenericModelAdmin, self).get_urls()
         opts = self.get_generic_relation_options()
         custom_urls = patterns('',
-            url(r'^obj/$', self.admin_site.admin_view(generic_lookup), name='admin_genericadmin_obj_lookup'),
+            url(r'^obj-data/$', self.admin_site.admin_view(generic_lookup), name='admin_genericadmin_obj_lookup'),
             url(r'^genericadmin-init/$', self.admin_site.admin_view(genericadmin_js_init), kwargs=opts, 
                 name='admin_genericadmin_init'),
         )
