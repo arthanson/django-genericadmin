@@ -193,7 +193,7 @@
             };
         },
 
-        installAdmin: function(fields, url_array) {
+        install: function(fields, url_array) {
             var that = this;
 
             this.url_array = url_array;
@@ -235,6 +235,64 @@
             this.updateObjectData()();
         }
     };
+    
+    var InlineAdmin = {
+        sub_admins: null,
+        url_array: null,
+        fields: null,
+        
+        install: function(fields, url_array) {
+            var inline_count = $('#id_' + fields.prefix + '-TOTAL_FORMS').val(),
+                admin;
+            
+            this.url_array = url_array;
+            this.fields = fields;
+            this.sub_admins = [];
+            
+            for (var j = 0; j < inline_count; j++) {
+                f = $.extend({}, this.fields);
+                f.number = j;
+                admin = $.extend({}, GenericAdmin);
+                admin.install(f, this.url_array);
+                this.sub_admins.push(admin);
+            }
+            $('#' + this.fields.prefix + '-group .add-row a').click(this.addHandler());
+        },
+        addHandler: function() {
+            var that = this;
+            return function(e) {
+                e.preventDefault();
+                var added_fields = $.extend({}, that.fields),
+                    admin = $.extend({}, GenericAdmin);
+                added_fields.number = ($('#id_' + that.fields.prefix + '-TOTAL_FORMS').val() - 1);
+                admin.installAdmin(added_fields, that.url_array);
+                that.sub_admins.push(admin);
+                
+                $('#' + that.fields.prefix + '-' + added_fields.number + ' .inline-deletelink').click(
+                    that.removeHandler(that)
+                );
+            }
+        },
+        removeHandler: function(that) {
+            return function(e) {
+                var parent_id,
+                    deleted_num,
+                    sub_admin;
+                
+                e.preventDefault();
+                parent_id = $(e.currentTarget).parents('.dynamic-' + that.fields.prefix).first().attr('id');
+                deleted_num = parseInt(parent_id.charAt(parent_id.length - 1), 10);
+                for (var i = (that.sub_admins.length - 1); i >= 0; i--) {
+                    sub_admin = that.sub_admins[i];
+                    if (sub_admin.fields.number === deleted_num) {
+                        that.sub_admins.splice(i, 1);
+                    } else if (sub_admin.fields.number > deleted_num) {
+                        sub_admin.fields.number = sub_admin.fields.number - 1;
+                    }
+                }
+            }
+        }
+    };
 
     $(document).ready(function() {
         $.ajax({
@@ -243,30 +301,14 @@
             success: function(data) {
                 var url_array = data.url_array,
                     ct_fields = data.fields,
-                    fields,
-                    inline_count,
-                    install_inline,
-                    f,
-                    click_closure = function (field_obj) {
-                        $('#' + field_obj.prefix + '-group .add-row a').click(function (e) {
-                            e.preventDefault();
-                            var added_fields = $.extend({}, field_obj);
-                            added_fields.number = ($('#id_' + fields.prefix + '-TOTAL_FORMS').val() - 1);
-                            $.extend({}, GenericAdmin).installAdmin(added_fields, url_array);
-                        });
-                    };
+                    fields;
+                    
                 for (var i = 0; i < ct_fields.length; i++) {
                     fields = ct_fields[i];
                     if (fields.inline === false) {
-                        $.extend({}, GenericAdmin).installAdmin(fields, url_array);
+                        $.extend({}, GenericAdmin).install(fields, url_array);
                     } else {
-                        inline_count = $('#id_' + fields.prefix + '-TOTAL_FORMS').val();
-                        for (var j = 0; j < inline_count; j++) {
-                            f = $.extend({}, fields);
-                            f.number = j;
-                            $.extend({}, GenericAdmin).installAdmin(f, url_array);
-                        }
-                        click_closure(fields);
+                        $.extend({}, InlineAdmin).install(fields, url_array);
                     }
                 }
             }
