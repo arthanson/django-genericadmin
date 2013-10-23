@@ -2,9 +2,6 @@
 
 A simple django app to make the lookup of generic models easier. 
 
-If used with grappelli only the model select is rendered a little nicer. 
-The rest is done by grappelli.
-
 ## Installation
 
 To install add it to your `INSTALLED_APPS` setting. There is no need to
@@ -84,6 +81,23 @@ class NavBarEntryAdmin(GenericAdminModelAdmin):
 
 Note that you can't mix and match.  If you're going to use a generic inline,
 the class using it must inherit from `GenericAdminModelAdmin`.
+
+## Specifying which fields are handled
+
+In most cases _django-genericadmin_ will correctly figure out which fields on your model are generic foreign keys and just do the right thing. If you want to specify the fields yourself (Be a man! Control your own destiny and all that) you can use the `generic_fk_fields` attribute on the admin class. Note that you can specify the fields on each admin class for inline admins. So, for the above mentioned inline admin, you would do it like so:
+
+```python
+class PagesInline(GenericTabularInline):
+   	model = AReallyCoolPage
+	generic_fk_fields = [{
+        'ct_field': <field_name_for_contenttype_fk>,
+        'fk_field': <field_name_for_object_id>,
+    }]
+```
+
+If you want to use more then one field pair, you can just add more dicts to the list.
+
+If you use the `ct_field` and `ct_fk_field` attributes _django-genericadmin_ will always just ignore those fields and not even try to use them.
 
 ## Blacklisting Content Types
 
