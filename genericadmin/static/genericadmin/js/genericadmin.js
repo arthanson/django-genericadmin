@@ -76,11 +76,19 @@
         },
         
         getFkId: function() {
-            return 'id_' + this.fields.fk_field;
+            if (this.fields.inline === false) {
+                return 'id_' + this.fields.fk_field;
+            } else {
+                return ['id_', this.fields.prefix, '-', this.fields.number, '-', this.fields.fk_field].join('');
+            }
         },
         
         getCtId: function() {
-            return 'id_' + this.fields.ct_field;
+            if (this.fields.inline === false) {
+                return 'id_' + this.fields.ct_field;
+            } else {
+                return ['id_', this.fields.prefix, '-', this.fields.number, '-', this.fields.ct_field].join('');
+            }
         },
         
         capFirst: function(string) {
@@ -97,12 +105,11 @@
         showLookupLink: function() {
             var that = this,
                 url = this.getLookupUrl(this.cID),
-                this_id = this.getFkId(),
-                id = 'lookup_' + this_id,
+                id = 'lookup_' + this.getFkId(),
                 link = '<a class="related-lookup" id="' + id + '" href="' + url + '">';
                 
             link = link + '<img src="' + this.admin_media_url + 'img/selector-search.gif" style="cursor: pointer; margin-left: 5px; margin-right: 10px;" width="16" height="16" alt="Lookup"></a>';
-            link = link + '<strong id="lookup_text_'+ this_id +'" margin-left: 5px"><a target="_new" href="#"></a><span></span></strong>';
+            link = link + '<strong id="lookup_text_'+ this.getFkId() +'" margin-left: 5px"><a target="_new" href="#"></a><span></span></strong>';
 
             // insert link html after input element
             this.object_input.after(link);
@@ -149,8 +156,8 @@
                 if (!value) { 
                     return 
                 }
-                var this_id = that.getFkId();
-                $('#lookup_text_' + this_id + ' span').text('loading...');
+                //var this_id = that.getFkId();
+                $('#lookup_text_' + that.getFkId() + ' span').text('loading...');
                 $.ajax({
                     url: that.obj_url,
                     dataType: 'json',
@@ -161,7 +168,7 @@
                     success: function(item) {
                         if (item && item.content_type_text && item.object_text) {
                             var url = that.getLookupUrl(that.cID);
-                            $('#lookup_text_' + this_id + ' a')
+                            $('#lookup_text_' + that.getFkId() + ' a')
                                 .text(item.content_type_text + ': ' + item.object_text)
                                 .attr('href', url + item.object_id);
 
@@ -171,15 +178,15 @@
                                 that.updateObjectDataCallback(item);
                             }
                         }
-                        $('#lookup_text_' + this_id + ' span').text('');
+                        $('#lookup_text_' + that.getFkId() + ' span').text('');
                     },
                     error: function(xhr, status, error) {
-                        $('#lookup_text_' + this_id + ' span').text('')
+                        $('#lookup_text_' + that.getFkId() + ' span').text('')
                             .html('Error: ' + xhr.status + ' &ndash; ' + that.capFirst(xhr.statusText.toLowerCase()));
                         if (xhr.status === 404) {
                             that.object_input.val('');
                         } else {
-                            $('#lookup_text_' + this_id + ' span').css('color', '#f00');
+                            $('#lookup_text_' + that.getFkId() + ' span').css('color', '#f00');
                         }
                     }
                 });
@@ -235,9 +242,32 @@
             dataType: 'json',
             success: function(data) {
                 var url_array = data.url_array,
-                    ct_fields = data.fields;
+                    ct_fields = data.fields,
+                    fields,
+                    inline_count,
+                    install_inline,
+                    f,
+                    click_closure = function (field_obj) {
+                        $('#' + field_obj.prefix + '-group .add-row a').click(function (e) {
+                            e.preventDefault();
+                            var added_fields = $.extend({}, field_obj);
+                            added_fields.number = ($('#id_' + fields.prefix + '-TOTAL_FORMS').val() - 1);
+                            $.extend({}, GenericAdmin).installAdmin(added_fields, url_array);
+                        });
+                    };
                 for (var i = 0; i < ct_fields.length; i++) {
-                    $.extend({}, GenericAdmin).installAdmin(ct_fields[i], url_array);
+                    fields = ct_fields[i];
+                    if (fields.inline === false) {
+                        $.extend({}, GenericAdmin).installAdmin(fields, url_array);
+                    } else {
+                        inline_count = $('#id_' + fields.prefix + '-TOTAL_FORMS').val();
+                        for (var j = 0; j < inline_count; j++) {
+                            f = $.extend({}, fields);
+                            f.number = j;
+                            $.extend({}, GenericAdmin).installAdmin(f, url_array);
+                        }
+                        click_closure(fields);
+                    }
                 }
             }
         });
