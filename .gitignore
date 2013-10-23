@@ -1,6 +1,9 @@
+*.pyc
 .project
 .pydevproject
-*.pyc
 dist/*
+*~
 MANIFEST
+*egg*
 *.bak
+*.tmproj
