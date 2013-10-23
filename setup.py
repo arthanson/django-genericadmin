@@ -1,9 +1,18 @@
+#!/usr/bin/env python
 
-from distutils.core import setup
+from setuptools import setup
+from subprocess import call
+
+def convert_readme():
+    try:
+        call(["pandoc", "-f", "markdown_github", "-t",  "rst", "-o",  "README.txt", "README.markdown"])
+    except OSError:
+        pass
+    return open('README.txt').read()
 
 setup(
     name='django-genericadmin',
-    version='0.4',
+    version='0.5',
     description="Adds support for generic relations within Django's admin interface.",
     author='Weston Nielson, Jan Schrewe',
     author_email='wnielson@gmail.com, jschrewe@googlemail.com',
@@ -19,6 +28,7 @@ setup(
         'Programming Language :: Python',
         'Framework :: Django',
     ],
+    long_description=convert_readme(),
     include_package_data=True,
     zip_safe=False,
     install_requires=['setuptools'],
