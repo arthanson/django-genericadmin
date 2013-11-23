@@ -14,6 +14,7 @@
         fields: null,
         obj_url: "../obj-data/",
         admin_media_url: window.__admin_media_prefix__,
+		popup: 'pop',
         
         prepareSelect: function(select) {
             var that = this,
@@ -130,15 +131,21 @@
         },
         
         popRelatedObjectLookup: function(link) {
-            var name = id_to_windowname(this.getFkId()), 
+            var name = id_to_windowname(this.getFkId()),
+				url_parts = [],
                 href, 
                 win;
 
             if (link.href.search(/\?/) >= 0) {
-                href = link.href + '&pop=1';
+				url_parts[0] = '&';
+                //href = link.href + '&pop=1';
             } else {
-                href = link.href + '?pop=1';
+				url_parts[0] = '?';
+                //href = link.href + '?pop=1';
             }
+			url_parts[1] = this.popup;
+			url_parts[2] = '=1';
+			href = link.href + url_parts.join('');
             win = window.open(href, name, 'height=500,width=800,resizable=yes,scrollbars=yes');
 
             // wait for popup to be closed and load object data
@@ -193,11 +200,12 @@
             };
         },
 
-        install: function(fields, url_array) {
+        install: function(fields, url_array, popup_var) {
             var that = this;
 
             this.url_array = url_array;
             this.fields = fields;
+			this.popup = popup_var;
             
             // store the base element
             this.object_input = $("#" + this.getFkId());
@@ -241,7 +249,7 @@
         url_array: null,
         fields: null,
         
-        install: function(fields, url_array) {
+        install: function(fields, url_array, popup_var) {
             var inline_count = $('#id_' + fields.prefix + '-TOTAL_FORMS').val(),
                 admin;
             
@@ -253,7 +261,7 @@
                 f = $.extend({}, this.fields);
                 f.number = j;
                 admin = $.extend({}, GenericAdmin);
-                admin.install(f, this.url_array);
+                admin.install(f, this.url_array, popup_var);
                 this.sub_admins.push(admin);
             }
             $('#' + this.fields.prefix + '-group .add-row a').click(this.addHandler());
@@ -301,14 +309,15 @@
             success: function(data) {
                 var url_array = data.url_array,
                     ct_fields = data.fields,
+					popup_var = data.popup_var,
                     fields;
                     
                 for (var i = 0; i < ct_fields.length; i++) {
                     fields = ct_fields[i];
                     if (fields.inline === false) {
-                        $.extend({}, GenericAdmin).install(fields, url_array);
+                        $.extend({}, GenericAdmin).install(fields, url_array, popup_var);
                     } else {
-                        $.extend({}, InlineAdmin).install(fields, url_array);
+                        $.extend({}, InlineAdmin).install(fields, url_array, popup_var);
                     }
                 }
             }

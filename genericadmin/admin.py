@@ -13,6 +13,10 @@ except ImportError:
 from django.utils.text import capfirst
 from django.contrib.admin.widgets import url_params_from_lookup_dict
 from django.http import HttpResponse, HttpResponseNotAllowed, Http404
+try:
+    from django.contrib.admin.views.main import IS_POPUP_VAR
+except ImportError:
+    from django.contrib.admin.options import IS_POPUP_VAR
 
 JS_PATH = getattr(settings, 'GENERICADMIN_JS', 'genericadmin/js/') 
 
@@ -95,6 +99,7 @@ class BaseGenericModelAdmin(object):
             data = {
                 'url_array': obj_dict,
                 'fields': self.get_generic_field_list(request),
+                'popup_var': IS_POPUP_VAR,
             }
             resp = json.dumps(data, ensure_ascii=False)
             return HttpResponse(resp, mimetype='application/json')
