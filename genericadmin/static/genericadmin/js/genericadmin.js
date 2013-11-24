@@ -248,6 +248,7 @@
         sub_admins: null,
         url_array: null,
         fields: null,
+		popup: '_popup',
         
         install: function(fields, url_array, popup_var) {
             var inline_count = $('#id_' + fields.prefix + '-TOTAL_FORMS').val(),
@@ -256,6 +257,7 @@
             this.url_array = url_array;
             this.fields = fields;
             this.sub_admins = [];
+			this.popup = popup_var || this.popup;
             
             for (var j = 0; j < inline_count; j++) {
                 f = $.extend({}, this.fields);
