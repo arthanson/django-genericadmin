@@ -54,6 +54,24 @@ becomes
 
 That's it.
 
+Provided admin classes
+----------------------
+
+A short overview of the admin classes and their uses provided by
+*django-genericadmin*.
+
+-  **GenericAdminModelAdmin** — The admin for a standard Django model
+   that has at least one generic foreign relation.
+
+-  **TabularInlineWithGeneric** and **StackedInlineWithGeneric** —
+   Normal inline admins for models that have a generic relation and are
+   edited inline.
+
+-  **GenericTabularInline** and **GenericStackedInline** — Used to
+   provide *True Polymorphic Relationships* (see below) and generic
+   relations in the admin. Also see the Django docs
+   `here <https://docs.djangoproject.com/en/dev/ref/contrib/contenttypes/#generic-relations-in-forms-and-admin>`__.
+
 Inline Usage
 ------------
 
@@ -74,9 +92,9 @@ Additionally the inline classes must inherit from either
 
 .. code:: python
 
-    from genericadmin.admin import GenericAdminModelAdmin, GenericTabularInline
+    from genericadmin.admin import GenericAdminModelAdmin, TabularInlineWithGeneric
 
-    class PagesInline(GenericTabularInline):
+    class PagesInline(TabularInlineWithGeneric):
         model = ...
 
     class NavBarEntryAdmin(GenericAdminModelAdmin):
@@ -100,7 +118,7 @@ admin, you would do it like so:
 
 .. code:: python
 
-    class PagesInline(GenericTabularInline):
+    class PagesInline(TabularInlineWithGeneric):
         model = AReallyCoolPage
         generic_fk_fields = [{
             'ct_field': <field_name_for_contenttype_fk>,
