@@ -44,6 +44,17 @@ admin.site.register(NavBarEntry, NavBarEntryAdmin)
 
 That's it.
 
+## Provided admin classes
+
+A short overview of the admin classes and their uses provided by  _django-genericadmin_.
+
+ * __GenericAdminModelAdmin__ &mdash; The admin for a standard Django model that has at least one generic foreign relation.
+
+ * __TabularInlineWithGeneric__ and __StackedInlineWithGeneric__ &mdash; Normal inline admins for models that have a generic relation and are edited inline.
+
+
+ * __GenericTabularInline__ and __GenericStackedInline__ &mdash; Used to provide _True Polymorphic Relationships_ (see below) and generic relations in the admin. Also see the Django docs [here](https://docs.djangoproject.com/en/dev/ref/contrib/contenttypes/#generic-relations-in-forms-and-admin).
+
 
 ## Inline Usage
 
@@ -61,9 +72,9 @@ admin.site.register(NavBarEntry, NavBarEntryAdmin)
 Additionally the inline classes must inherit from either `GenericStackedInline` or `GenericTabularInline`:
 
 ```python
-from genericadmin.admin import GenericAdminModelAdmin, GenericTabularInline
+from genericadmin.admin import GenericAdminModelAdmin, TabularInlineWithGeneric
 
-class PagesInline(GenericTabularInline):
+class PagesInline(TabularInlineWithGeneric):
    	model = ...
 
 class NavBarEntryAdmin(GenericAdminModelAdmin):
@@ -79,7 +90,7 @@ Note that you can't mix and match.  If you're going to use a generic inline, the
 In most cases _django-genericadmin_ will correctly figure out which fields on your model are generic foreign keys and just do the right thing. If you want to specify the fields yourself (Be a man! Control your own destiny and all that) you can use the `generic_fk_fields` attribute on the admin class. Note that you can specify the fields on each admin class for inline admins. So, for the above mentioned inline admin, you would do it like so:
 
 ```python
-class PagesInline(GenericTabularInline):
+class PagesInline(TabularInlineWithGeneric):
    	model = AReallyCoolPage
 	generic_fk_fields = [{
         'ct_field': <field_name_for_contenttype_fk>,
