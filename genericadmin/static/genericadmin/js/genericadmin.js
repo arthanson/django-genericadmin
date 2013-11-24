@@ -14,7 +14,7 @@
         fields: null,
         obj_url: "../obj-data/",
         admin_media_url: window.__admin_media_prefix__,
-		popup: 'pop',
+		popup: '_popup',
         
         prepareSelect: function(select) {
             var that = this,
@@ -205,7 +205,7 @@
 
             this.url_array = url_array;
             this.fields = fields;
-			this.popup = popup_var;
+			this.popup = popup_var || this.popup;
             
             // store the base element
             this.object_input = $("#" + this.getFkId());
@@ -273,7 +273,7 @@
                 var added_fields = $.extend({}, that.fields),
                     admin = $.extend({}, GenericAdmin);
                 added_fields.number = ($('#id_' + that.fields.prefix + '-TOTAL_FORMS').val() - 1);
-                admin.installAdmin(added_fields, that.url_array);
+                admin.install(added_fields, that.url_array);
                 that.sub_admins.push(admin);
                 
                 $('#' + that.fields.prefix + '-' + added_fields.number + ' .inline-deletelink').click(
