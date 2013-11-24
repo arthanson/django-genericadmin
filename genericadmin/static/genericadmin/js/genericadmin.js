@@ -273,7 +273,7 @@
                 var added_fields = $.extend({}, that.fields),
                     admin = $.extend({}, GenericAdmin);
                 added_fields.number = ($('#id_' + that.fields.prefix + '-TOTAL_FORMS').val() - 1);
-                admin.install(added_fields, that.url_array);
+                admin.install(added_fields, that.url_array, that.popup);
                 that.sub_admins.push(admin);
                 
                 $('#' + that.fields.prefix + '-' + added_fields.number + ' .inline-deletelink').click(
