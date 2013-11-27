@@ -17,6 +17,7 @@ try:
     from django.contrib.admin.views.main import IS_POPUP_VAR
 except ImportError:
     from django.contrib.admin.options import IS_POPUP_VAR
+from  django.core.exceptions import ObjectDoesNotExist
 
 JS_PATH = getattr(settings, 'GENERICADMIN_JS', 'genericadmin/js/') 
 
