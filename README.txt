@@ -88,7 +88,7 @@ inherit from ``GenericAdminModelAdmin`` as described above:
     admin.site.register(NavBarEntry, NavBarEntryAdmin)
 
 Additionally the inline classes must inherit from either
-``GenericStackedInline`` or ``GenericTabularInline``:
+``StackedInlineWithGeneric`` or ``TabularInlineWithGeneric``:
 
 .. code:: python
 

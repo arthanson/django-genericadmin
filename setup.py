@@ -18,7 +18,7 @@ setup(
     author_email='wnielson@gmail.com, jschrewe@googlemail.com',
     url='https://github.com/jschrewe/django-genericadmin',
     packages = ['genericadmin'],
-    package_data={'genericadmin': ['static/genericadmin/js/*.js']},
+#    package_data={'genericadmin': ['static/genericadmin/js/genericadmin.js']},
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Environment :: Web Environment',
@@ -31,5 +31,4 @@ setup(
     long_description=convert_readme(),
     include_package_data=True,
     zip_safe=False,
-    install_requires=['setuptools'],
 )
