@@ -12,7 +12,7 @@ def convert_readme():
 
 setup(
     name='django-genericadmin',
-    version='0.6',
+    version='0.6.1',
     description="Adds support for generic relations within Django's admin interface.",
     author='Weston Nielson, Jan Schrewe',
     author_email='wnielson@gmail.com, jschrewe@googlemail.com',
