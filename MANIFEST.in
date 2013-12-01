@@ -1,1 +1,1 @@
-include genericadmin/static/genericadmin/*
+include genericadmin/static/genericadmin/js/*
