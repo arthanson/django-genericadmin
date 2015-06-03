@@ -37,6 +37,9 @@ class BaseGenericModelAdmin(object):
             media = []
         media.append(JS_PATH + 'genericadmin.js')
         self.Media.js = tuple(media)
+        
+        self.content_type_whitelist = [s.lower() for s in self.content_type_whitelist]
+        self.content_type_blacklist = [s.lower() for s in self.content_type_blacklist]        
             
         super(BaseGenericModelAdmin, self).__init__(model, admin_site)
 
