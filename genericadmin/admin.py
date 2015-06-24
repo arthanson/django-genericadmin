@@ -4,8 +4,10 @@ from functools import update_wrapper
 from django.contrib import admin
 from django.conf.urls import patterns, url
 from django.conf import settings
-from django.contrib.contenttypes import generic
+from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes import admin as GA
+
 try:
     from django.utils.encoding import force_text 
 except ImportError:
@@ -59,10 +61,11 @@ class BaseGenericModelAdmin(object):
                     field_list.append(fields)
         else:    
             for field in self.model._meta.virtual_fields:
-                if isinstance(field, generic.GenericForeignKey) and \
-                        field.ct_field not in exclude and field.fk_field not in exclude:
+                if (isinstance(field, GenericForeignKey) and
+                            field.ct_field not in exclude and
+                            field.fk_field not in exclude):
                     field_list.append({
-                        'ct_field': field.ct_field, 
+                        'ct_field': field.ct_field,
                         'fk_field': field.fk_field,
                         'inline': prefix != '',
                         'prefix': prefix,
@@ -136,18 +139,17 @@ class BaseGenericModelAdmin(object):
         else:
             resp = ''
         return HttpResponse(resp, content_type='application/json')
-        
 
 
 class GenericAdminModelAdmin(BaseGenericModelAdmin, admin.ModelAdmin):
     """Model admin for generic relations. """
 
 
-class GenericTabularInline(BaseGenericModelAdmin, generic.GenericTabularInline):
+class GenericTabularInline(BaseGenericModelAdmin, GA.GenericTabularInline):
     """Model admin for generic tabular inlines. """ 
 
 
-class GenericStackedInline(BaseGenericModelAdmin, generic.GenericStackedInline):
+class GenericStackedInline(BaseGenericModelAdmin, GA.GenericStackedInline):
     """Model admin for generic stacked inlines. """
 
 
