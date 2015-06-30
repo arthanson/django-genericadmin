@@ -73,7 +73,7 @@
         },
 
         getLookupUrl: function(cID) {
-            return this.url_array[cID][0] + '/' + this.getLookupUrlParams(cID);
+            return this.url_array[cID][0] + this.getLookupUrlParams(cID);
         },
 
         getFkId: function() {
