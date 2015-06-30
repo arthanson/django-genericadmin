@@ -1,8 +1,7 @@
 import json
 from functools import update_wrapper
 
-from django.core.urlresolvers import reverse
-from django.core.exceptions import NoReverseMatch
+from django.core.urlresolvers import reverse, NoReverseMatch
 from django.contrib import admin
 from django.conf.urls import patterns, url
 from django.conf import settings
