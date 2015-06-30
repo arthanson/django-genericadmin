@@ -106,9 +106,9 @@ class BaseGenericModelAdmin(object):
 
                 if self.content_type_whitelist:
                     if val in self.content_type_whitelist:
-                        obj_dict[c.id] = (url, params)
+                        obj_dict[c.id] = (val, url, params)
                 elif val not in self.content_type_blacklist:
-                    obj_dict[c.id] = (url, params)
+                    obj_dict[c.id] = (val, url, params)
 
             data = {
                 'url_array': obj_dict,

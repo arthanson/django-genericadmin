@@ -62,7 +62,7 @@
         },
 
         getLookupUrlParams: function(cID) {
-            var q = this.url_array[cID][1] || {},
+            var q = this.url_array[cID][2] || {},
                 str = [];
             for(var p in q) {
                 str.push(encodeURIComponent(p) + "=" + encodeURIComponent(q[p]));
@@ -73,7 +73,7 @@
         },
 
         getLookupUrl: function(cID) {
-            return this.url_array[cID][0] + this.getLookupUrlParams(cID);
+            return this.url_array[cID][1] + this.getLookupUrlParams(cID);
         },
 
         getFkId: function() {
