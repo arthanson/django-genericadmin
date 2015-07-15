@@ -4,7 +4,11 @@ A simple django app to make the lookup of generic models easier.
 
 ## Installation
 
-To install add it to your `INSTALLED_APPS` setting. There is no need to run `manage.py syncdb` because _django-genericadmin_ does not have any models.
+Run the usual
+
+```pip install django-genericadmin```
+
+and add it to your `INSTALLED_APPS` in your project's `settings.py`. There is no need to run `manage.py syncdb` or `manage.py migrate` because _django-genericadmin_ does not have any models.
 
 ```python
 INSTALLED_APPS = (
