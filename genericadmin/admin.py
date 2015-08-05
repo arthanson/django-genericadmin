@@ -100,7 +100,7 @@ class BaseGenericModelAdmin(object):
                 try:
                     # Reverse the admin changelist url
                     url = reverse('admin:%s_%s_changelist' % (
-                        c.app_label, c.model), kwargs=params)
+                        c.app_label, c.model))
                 except (NoReverseMatch, ):
                     continue
 
