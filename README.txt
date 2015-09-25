@@ -110,11 +110,11 @@ Specifying which fields are handled
 
 In most cases *django-genericadmin* will correctly figure out which
 fields on your model are generic foreign keys and just do the right
-thing. If you want to specify the fields yourself (Be a man! Control
-your own destiny and all that) you can use the ``generic_fk_fields``
-attribute on the admin class. Note that you can specify the fields on
-each admin class for inline admins. So, for the above mentioned inline
-admin, you would do it like so:
+thing. If you want to specify the fields yourself (Control your own
+destiny and all that) you can use the ``generic_fk_fields`` attribute on
+the admin class. Note that you can specify the fields on each admin
+class for inline admins. So, for the above mentioned inline admin, you
+would do it like so:
 
 .. code:: python
 
