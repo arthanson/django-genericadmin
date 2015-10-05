@@ -72,8 +72,10 @@
             return url;
         },
 
-        getLookupUrl: function(cID) {
-            return this.url_array[cID][1] + this.getLookupUrlParams(cID);
+        getLookupUrl: function(cID, params=true) {
+            url = this.url_array[cID][1];
+            if(params){url + this.getLookupUrlParams(cID);}
+            return url;
         },
 
         getFkId: function() {
@@ -105,7 +107,7 @@
 
         showLookupLink: function() {
             var that = this,
-                url = this.getLookupUrl(this.cID),
+                url = this.getLookupUrl(this.cID, false),
                 id = 'lookup_' + this.getFkId(),
                 link = '<a class="related-lookup" id="' + id + '" href="' + url + '">';
 
