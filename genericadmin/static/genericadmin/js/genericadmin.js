@@ -72,10 +72,9 @@
             return url;
         },
 
-        getLookupUrl: function(cID, params) {
-            params = params || true;
-            url = this.url_array[cID][1];
-            if(params){url + this.getLookupUrlParams(cID);}
+        getLookupUrl: function(cID, with_params) {
+            var url = this.url_array[cID][1];
+            if(with_params){url = url + this.getLookupUrlParams(cID);}
             return url;
         },
 
@@ -108,7 +107,7 @@
 
         showLookupLink: function() {
             var that = this,
-                url = this.getLookupUrl(this.cID, false),
+                url = this.getLookupUrl(this.cID, true),
                 id = 'lookup_' + this.getFkId(),
                 link = '<a class="related-lookup" id="' + id + '" href="' + url + '">';
 
@@ -177,7 +176,7 @@
                     },
                     success: function(item) {
                         if (item && item.content_type_text && item.object_text) {
-                            var url = that.getLookupUrl(that.cID);
+                            var url = that.getLookupUrl(that.cID, false);
                             $('#lookup_text_' + that.getFkId() + ' a')
                                 .text(item.content_type_text + ': ' + item.object_text)
                                 .attr('href', url + item.object_id);
