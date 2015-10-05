@@ -72,7 +72,8 @@
             return url;
         },
 
-        getLookupUrl: function(cID, params=true) {
+        getLookupUrl: function(cID, params) {
+            params = params || true;
             url = this.url_array[cID][1];
             if(params){url + this.getLookupUrlParams(cID);}
             return url;
