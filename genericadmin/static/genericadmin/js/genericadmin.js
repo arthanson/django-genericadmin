@@ -145,7 +145,7 @@
 			url_parts[1] = this.popup;
 			url_parts[2] = '=1';
 			href = link.href + url_parts.join('');
-            win = window.open(href, name, 'height=500,width=800,resizable=yes,scrollbars=yes');
+            win = window.open(href, name, 'height=500,width=800,resizable=yes,scrollbars=yes,chrome=yes,centerscreen=yes');
 
             // wait for popup to be closed and load object data
             this.pollInputChange(win);
