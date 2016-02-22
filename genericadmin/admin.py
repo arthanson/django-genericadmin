@@ -64,7 +64,7 @@ class BaseGenericModelAdmin(object):
                     field_list.append(fields)
         else:    
             for field in self.model._meta.virtual_fields:
-                if isinstance(field, generic.GenericForeignKey) and \
+                if isinstance(field, GenericForeignKey) and \
                         field.ct_field not in exclude and field.fk_field not in exclude:
                     field_list.append({
                         'ct_field': field.ct_field, 
@@ -148,11 +148,11 @@ class GenericAdminModelAdmin(BaseGenericModelAdmin, admin.ModelAdmin):
     """Model admin for generic relations. """
 
 
-class GenericTabularInline(BaseGenericModelAdmin, generic.GenericTabularInline):
+class GenericTabularInline(BaseGenericModelAdmin, GenericTabularInline):
     """Model admin for generic tabular inlines. """ 
 
 
-class GenericStackedInline(BaseGenericModelAdmin, generic.GenericStackedInline):
+class GenericStackedInline(BaseGenericModelAdmin, GenericStackedInline):
     """Model admin for generic stacked inlines. """
 
 
