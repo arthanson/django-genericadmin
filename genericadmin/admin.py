@@ -5,7 +5,12 @@ from django.core.urlresolvers import reverse, NoReverseMatch
 from django.contrib import admin
 from django.conf.urls import patterns, url
 from django.conf import settings
-from django.contrib.contenttypes import generic
+try:
+    from django.contrib.contenttypes.generic import GenericForeignKey,  GenericTabularInline, GenericStackedInline
+except ImportError:
+    from django.contrib.contenttypes.admin import GenericStackedInline, GenericTabularInline
+    from django.contrib.contenttypes.fields import GenericForeignKey
+
 from django.contrib.contenttypes.models import ContentType
 try:
     from django.utils.encoding import force_text
@@ -60,7 +65,7 @@ class BaseGenericModelAdmin(object):
                     field_list.append(fields)
         else:
             for field in self.model._meta.virtual_fields:
-                if isinstance(field, generic.GenericForeignKey) and \
+                if isinstance(field, GenericForeignKey) and \
                         field.ct_field not in exclude and field.fk_field not in exclude:
                     field_list.append({
                         'ct_field': field.ct_field,
@@ -152,11 +157,11 @@ class GenericAdminModelAdmin(BaseGenericModelAdmin, admin.ModelAdmin):
     """Model admin for generic relations. """
 
 
-class GenericTabularInline(BaseGenericModelAdmin, generic.GenericTabularInline):
+class GenericTabularInline(BaseGenericModelAdmin, GenericTabularInline):
     """Model admin for generic tabular inlines. """
 
 
-class GenericStackedInline(BaseGenericModelAdmin, generic.GenericStackedInline):
+class GenericStackedInline(BaseGenericModelAdmin, GenericStackedInline):
     """Model admin for generic stacked inlines. """
 
 
