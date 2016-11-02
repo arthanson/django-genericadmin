@@ -107,9 +107,8 @@
             var that = this,
                 url = this.getLookupUrl(this.cID),
                 id = 'lookup_' + this.getFkId(),
-                link = '<a class="related-lookup" id="' + id + '" href="' + url + '">';
+                link = '<a class="related-lookup" id="' + id + '" href="' + url + '">&nbsp;</a>';
                 
-            link = link + '<img src="' + this.admin_media_url.replace(/\/?$/, '/') + 'img/selector-search.gif" style="cursor: pointer; margin-left: 5px; margin-right: 10px;" width="16" height="16" alt="Lookup"></a>';
             link = link + '<strong id="lookup_text_'+ this.getFkId() +'" margin-left: 5px"><a target="_new" href="#"></a><span></span></strong>';
 
             // insert link html after input element
@@ -146,7 +145,10 @@
 			url_parts[1] = this.popup;
 			url_parts[2] = '=1';
 			href = link.href + url_parts.join('');
-            win = window.open(href, name, 'height=500,width=800,resizable=yes,scrollbars=yes');
+
+	    var left = window.screen.width / 2 - 400,
+	        top = window.screen.height / 2 - 250;
+            win = window.open(href, name, 'left='+left+',top='+top+',height=500,width=800,resizable=yes,scrollbars=yes');
 
             // wait for popup to be closed and load object data
             this.pollInputChange(win);
