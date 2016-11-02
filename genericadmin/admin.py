@@ -2,7 +2,7 @@ import json
 from functools import update_wrapper
 
 from django.contrib import admin
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 from django.conf import settings
 try:
     from django.contrib.contenttypes.generic import GenericForeignKey,  GenericTabularInline, GenericStackedInline
@@ -87,10 +87,10 @@ class BaseGenericModelAdmin(object):
                 return self.admin_site.admin_view(view)(*args, **kwargs)
             return update_wrapper(wrapper, view)
         
-        custom_urls = patterns('',
+        custom_urls = [
             url(r'^obj-data/$', wrap(self.generic_lookup), name='admin_genericadmin_obj_lookup'),
             url(r'^genericadmin-init/$', wrap(self.genericadmin_js_init), name='admin_genericadmin_init'),
-        )
+        ]
         return custom_urls + super(BaseGenericModelAdmin, self).get_urls()
             
     def genericadmin_js_init(self, request):
