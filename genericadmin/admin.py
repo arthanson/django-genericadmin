@@ -74,11 +74,10 @@ class BaseGenericModelAdmin(object):
                     })
                     
         if hasattr(self, 'inlines') and len(self.inlines) > 0:
-            for FormSet, inline in zip(self.get_formsets(request), self.get_inline_instances(request)):
+            for FormSet, inline in self.get_formsets_with_inlines(request):
                 if hasattr(inline, 'get_generic_field_list'):
                     prefix = FormSet.get_default_prefix()
                     field_list = field_list + inline.get_generic_field_list(request, prefix)
-
         return field_list
 
     def get_urls(self):
@@ -90,10 +89,12 @@ class BaseGenericModelAdmin(object):
         custom_urls = [
             url(r'^obj-data/$', wrap(self.generic_lookup), name='admin_genericadmin_obj_lookup'),
             url(r'^genericadmin-init/$', wrap(self.genericadmin_js_init), name='admin_genericadmin_init'),
+            url(r'^(\d+)/obj-data/$', wrap(self.generic_lookup), name='admin_genericadmin_obj_lookup_change'),
+            url(r'^(\d+)/genericadmin-init/change/$', wrap(self.genericadmin_js_init), name='admin_genericadmin_init_change'),
         ]
         return custom_urls + super(BaseGenericModelAdmin, self).get_urls()
             
-    def genericadmin_js_init(self, request):
+    def genericadmin_js_init(self, request, pk=None):
         if request.method == 'GET':
             obj_dict = {}
             for c in ContentType.objects.all():
@@ -115,10 +116,10 @@ class BaseGenericModelAdmin(object):
             return HttpResponse(resp, content_type='application/json')
         return HttpResponseNotAllowed(['GET'])
     
-    def generic_lookup(self, request):
+    def generic_lookup(self, request, pk=None):
         if request.method != 'GET':
             return HttpResponseNotAllowed(['GET'])
-        
+
         if 'content_type' in request.GET and 'object_id' in request.GET:
             content_type_id = request.GET['content_type']
             object_id = request.GET['object_id']
