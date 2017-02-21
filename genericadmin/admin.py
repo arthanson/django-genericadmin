@@ -78,7 +78,6 @@ class BaseGenericModelAdmin(object):
                 if hasattr(inline, 'get_generic_field_list'):
                     prefix = FormSet.get_default_prefix()
                     field_list = field_list + inline.get_generic_field_list(request, prefix)
-        print(field_list)
         return field_list
 
     def get_urls(self):
