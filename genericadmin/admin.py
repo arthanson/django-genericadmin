@@ -89,6 +89,7 @@ class BaseGenericModelAdmin(object):
         custom_urls = [
             url(r'^obj-data/$', wrap(self.generic_lookup), name='admin_genericadmin_obj_lookup'),
             url(r'^genericadmin-init/$', wrap(self.genericadmin_js_init), name='admin_genericadmin_init'),
+            url(r'^(\d+)/obj-data/$', wrap(self.generic_lookup), name='admin_genericadmin_obj_lookup_change'),
             url(r'^(\d+)/genericadmin-init/change/$', wrap(self.genericadmin_js_init), name='admin_genericadmin_init_change'),
         ]
         return custom_urls + super(BaseGenericModelAdmin, self).get_urls()
@@ -115,10 +116,10 @@ class BaseGenericModelAdmin(object):
             return HttpResponse(resp, content_type='application/json')
         return HttpResponseNotAllowed(['GET'])
     
-    def generic_lookup(self, request):
+    def generic_lookup(self, request, pk=None):
         if request.method != 'GET':
             return HttpResponseNotAllowed(['GET'])
-        
+
         if 'content_type' in request.GET and 'object_id' in request.GET:
             content_type_id = request.GET['content_type']
             object_id = request.GET['object_id']
