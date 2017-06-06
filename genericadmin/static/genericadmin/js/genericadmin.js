@@ -179,7 +179,7 @@
                             var url = that.getLookupUrl(that.cID);
                             $('#lookup_text_' + that.getFkId() + ' a')
                                 .text(item.content_type_text + ': ' + item.object_text)
-                                .attr('href', url + item.object_id);
+                                .attr('href', url + item.object_id + '/');
 
                             // run a callback to do other stuff like prepopulating url fields
                             // can't be done with normal django admin prepopulate
