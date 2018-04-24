@@ -12,10 +12,10 @@
     var GenericAdmin = {
         url_array: null,
         fields: null,
-        obj_url: "../obj-data/",
+        obj_url: "../genericadmin-obj-data/",
         admin_media_url: window.__admin_media_prefix__,
 		popup: '_popup',
-        
+
         prepareSelect: function(select) {
             var that = this,
                 opt_keys = [],
@@ -30,7 +30,7 @@
                 if (this.value) {
                     if (that.url_array[this.value]) {
                         key = that.url_array[this.value][0].split('/')[0];
-                        
+
                         opt = $(this).clone();
                         opt.text(that.capFirst(opt.text()));
                         if ($.inArray(key, opt_keys) < 0) {
@@ -47,7 +47,7 @@
                 }
             });
             select.empty().append(no_value);
-            
+
             opt_keys = opt_keys.sort();
 
             $.each(opt_keys, function(index, key) {
@@ -61,8 +61,9 @@
             return select;
         },
 
+
         getLookupUrlParams: function(cID) {
-            var q = this.url_array[cID][1] || {}, 
+            var q = this.url_array[cID][2] || {},
                 str = [];
             for(var p in q) {
                 str.push(encodeURIComponent(p) + "=" + encodeURIComponent(q[p]));
@@ -71,11 +72,13 @@
             url = x ? ("?" + x) : "";
             return url;
         },
-        
-        getLookupUrl: function(cID) {
-            return '../../../' + this.url_array[cID][0] + '/' + this.getLookupUrlParams(cID);
+
+        getLookupUrl: function(cID, with_params) {
+            var url = this.url_array[cID][1];
+            if(with_params){url = url + this.getLookupUrlParams(cID);}
+            return url;
         },
-        
+
         getFkId: function() {
             if (this.fields.inline === false) {
                 return 'id_' + this.fields.fk_field;
@@ -83,7 +86,7 @@
                 return ['id_', this.fields.prefix, '-', this.fields.number, '-', this.fields.fk_field].join('');
             }
         },
-        
+
         getCtId: function() {
             if (this.fields.inline === false) {
                 return 'id_' + this.fields.ct_field;
@@ -91,24 +94,24 @@
                 return ['id_', this.fields.prefix, '-', this.fields.number, '-', this.fields.ct_field].join('');
             }
         },
-        
+
         capFirst: function(string) {
             return string.charAt(0).toUpperCase() + string.slice(1);
         },
-        
+
         hideLookupLink: function() {
             var this_id = this.getFkId();
             $('#lookup_' + this_id).unbind().remove();
             $('#lookup_text_' + this_id + ' a').remove();
             $('#lookup_text_' + this_id + ' span').remove();
         },
-        
+
         showLookupLink: function() {
             var that = this,
-                url = this.getLookupUrl(this.cID),
+                url = this.getLookupUrl(this.cID, true),
                 id = 'lookup_' + this.getFkId(),
                 link = '<a class="related-lookup" id="' + id + '" href="' + url + '">&nbsp;</a>';
-                
+
             link = link + '<strong id="lookup_text_'+ this.getFkId() +'" margin-left: 5px"><a target="_new" href="#"></a><span></span></strong>';
 
             // insert link html after input element
@@ -116,7 +119,7 @@
 
             return id;
         },
-        
+
         pollInputChange: function(window) {
             var that = this,
                 interval_id = setInterval(function() {
@@ -128,11 +131,11 @@
                 },
                 150);
         },
-        
+
         popRelatedObjectLookup: function(link) {
             var name = id_to_windowname(this.getFkId()),
 				url_parts = [],
-                href, 
+                href,
                 win;
 
             if (link.href.search(/\?/) >= 0) {
@@ -156,14 +159,14 @@
             win.focus();
             return false;
         },
-        
+
         updateObjectData: function() {
             var that = this;
             return function() {
                 var value = that.object_input.val();
-                
-                if (!value) { 
-                    return 
+
+                if (!value) {
+                    return
                 }
                 //var this_id = that.getFkId();
                 $('#lookup_text_' + that.getFkId() + ' span').text('loading...');
@@ -176,7 +179,7 @@
                     },
                     success: function(item) {
                         if (item && item.content_type_text && item.object_text) {
-                            var url = that.getLookupUrl(that.cID);
+                            var url = that.getLookupUrl(that.cID, false);
                             $('#lookup_text_' + that.getFkId() + ' a')
                                 .text(item.content_type_text + ': ' + item.object_text)
                                 .attr('href', url + item.object_id);
@@ -208,10 +211,10 @@
             this.url_array = url_array;
             this.fields = fields;
 			this.popup = popup_var || this.popup;
-            
+
             // store the base element
             this.object_input = $("#" + this.getFkId());
-            
+
             // find the select we need to change
             this.object_select = this.prepareSelect($("#" + this.getCtId()));
 
@@ -245,22 +248,22 @@
             this.updateObjectData()();
         }
     };
-    
+
     var InlineAdmin = {
         sub_admins: null,
         url_array: null,
         fields: null,
 		popup: '_popup',
-        
+
         install: function(fields, url_array, popup_var) {
             var inline_count = $('#id_' + fields.prefix + '-TOTAL_FORMS').val(),
                 admin;
-            
+
             this.url_array = url_array;
             this.fields = fields;
             this.sub_admins = [];
 			this.popup = popup_var || this.popup;
-            
+
             for (var j = 0; j < inline_count; j++) {
                 f = $.extend({}, this.fields);
                 f.number = j;
@@ -279,7 +282,7 @@
                 added_fields.number = ($('#id_' + that.fields.prefix + '-TOTAL_FORMS').val() - 1);
                 admin.install(added_fields, that.url_array, that.popup);
                 that.sub_admins.push(admin);
-                
+
                 $('#' + that.fields.prefix + '-' + added_fields.number + ' .inline-deletelink').click(
                     that.removeHandler(that)
                 );
@@ -290,7 +293,7 @@
                 var parent_id,
                     deleted_num,
                     sub_admin;
-                
+
                 e.preventDefault();
                 parent_id = $(e.currentTarget).parents('.dynamic-' + that.fields.prefix).first().attr('id');
                 deleted_num = parseInt(parent_id.charAt(parent_id.length - 1), 10);
@@ -315,7 +318,7 @@
                     ct_fields = data.fields,
 					popup_var = data.popup_var,
                     fields;
-                    
+
                 for (var i = 0; i < ct_fields.length; i++) {
                     fields = ct_fields[i];
                     if (fields.inline === false) {
