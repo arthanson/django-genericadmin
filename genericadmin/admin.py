@@ -63,7 +63,8 @@ class BaseGenericModelAdmin(object):
                     fields['prefix'] = prefix
                     field_list.append(fields)
         else:    
-            for field in self.model._meta.virtual_fields:
+            # for field in self.model._meta.virtual_fields:
+            for field in self.model._meta.private_fields:
                 if isinstance(field, GenericForeignKey) and \
                         field.ct_field not in exclude and field.fk_field not in exclude:
                     field_list.append({
