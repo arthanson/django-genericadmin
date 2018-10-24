@@ -104,8 +104,8 @@ class BaseGenericModelAdmin(object):
             url(r'^genericadmin-init/$', wrap(self.genericadmin_js_init), name='admin_genericadmin_init'),
 
             # to work with django 2.0
-            url(r'../genericadmin-init/change/$',
-                wrap(RedirectView.as_view(pattern_name='%s:admin_genericadmin_init' % self.admin_site.name))),
+            url(r'^../obj-data/$', wrap(self.generic_lookup), name='admin_genericadmin_obj_lookup_change'),
+            url(r'^../genericadmin-init/change/$', wrap(self.genericadmin_js_init), name='admin_genericadmin_init'),
         ]
         return custom_urls + super(BaseGenericModelAdmin, self).get_urls()
 
