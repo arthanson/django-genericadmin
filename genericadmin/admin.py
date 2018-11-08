@@ -97,7 +97,7 @@ class BaseGenericModelAdmin(object):
         if request.method == 'GET':
             obj_dict = {}
             for c in ContentType.objects.all():
-                val = force_text('%s/%s' % (c.app_label, c.model))
+                val = force_text('%s/%s' % (c.app_label, c.model)).lower()
                 params = self.content_type_lookups.get('%s.%s' % (c.app_label, c.model), {})
                 params = url_params_from_lookup_dict(params)
                 if self.content_type_whitelist:
