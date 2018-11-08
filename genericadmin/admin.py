@@ -101,9 +101,9 @@ class BaseGenericModelAdmin(object):
                 params = self.content_type_lookups.get('%s.%s' % (c.app_label, c.model), {})
                 params = url_params_from_lookup_dict(params)
                 if self.content_type_whitelist:
-                    if val in self.content_type_whitelist:
+                    if val.lower() in self.content_type_whitelist:
                         obj_dict[c.id] = (val, params)
-                elif val not in self.content_type_blacklist:
+                elif val.lower() not in self.content_type_blacklist:
                     obj_dict[c.id] = (val, params)
 
             data = {
