@@ -1,3 +1,5 @@
+# Taken from git@github.com:codegraft/django-genericadmin.git
+
 import json
 from functools import update_wrapper
 
@@ -23,6 +25,7 @@ try:
 except ImportError:
     from django.contrib.admin.options import IS_POPUP_VAR
 from  django.core.exceptions import ObjectDoesNotExist
+from django.views.generic import RedirectView
 
 JS_PATH = getattr(settings, 'GENERICADMIN_JS', 'genericadmin/js/')
 
@@ -40,6 +43,7 @@ class BaseGenericModelAdmin(object):
             media = list(self.Media.js)
         except:
             media = []
+        media.append('admin/js/jquery.init.js')
         media.append(JS_PATH + 'genericadmin.js')
         self.Media.js = tuple(media)
 
@@ -63,7 +67,12 @@ class BaseGenericModelAdmin(object):
                     fields['prefix'] = prefix
                     field_list.append(fields)
         else:
-            for field in self.model._meta.virtual_fields:
+            # virtual_fields were deprecated in django 2.0
+            try:
+                fields = self.model._meta.virtual_fields
+            except AttributeError:
+                fields = self.model._meta.private_fields
+            for field in fields:
                 if isinstance(field, GenericForeignKey) and \
                         field.ct_field not in exclude and field.fk_field not in exclude:
                     field_list.append({
@@ -74,10 +83,16 @@ class BaseGenericModelAdmin(object):
                     })
 
         if hasattr(self, 'inlines') and len(self.inlines) > 0:
-            for FormSet, inline in zip(self.get_formsets_with_inlines(request), self.get_inline_instances(request)):
-                if hasattr(inline, 'get_generic_field_list'):
-                    prefix = FormSet.get_default_prefix()
-                    field_list = field_list + inline.get_generic_field_list(request, prefix)
+            try:
+                for FormSet, inline in zip(self.get_formsets_with_inlines(request), self.get_inline_instances(request)):
+                    if hasattr(inline, 'get_generic_field_list'):
+                        prefix = FormSet.get_default_prefix()
+                        field_list = field_list + inline.get_generic_field_list(request, prefix)
+            except AttributeError:
+                for FormSet, inline in self.get_formsets_with_inlines(request):
+                    if hasattr(inline, 'get_generic_field_list'):
+                        prefix = FormSet.get_default_prefix()
+                        field_list = field_list + inline.get_generic_field_list(request, prefix)
 
         return field_list
 
@@ -90,6 +105,10 @@ class BaseGenericModelAdmin(object):
         custom_urls = [
             url(r'^obj-data/$', wrap(self.generic_lookup), name='admin_genericadmin_obj_lookup'),
             url(r'^genericadmin-init/$', wrap(self.genericadmin_js_init), name='admin_genericadmin_init'),
+
+#            # to work with django 2.0
+#            url(r'^../obj-data/$', wrap(self.generic_lookup), name='admin_genericadmin_obj_lookup_change'),
+#            url(r'^../genericadmin-init/change/$', wrap(self.genericadmin_js_init), name='admin_genericadmin_init'),
         ]
         return custom_urls + super(BaseGenericModelAdmin, self).get_urls()
 
