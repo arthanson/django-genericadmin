@@ -73,7 +73,13 @@
         },
         
         getLookupUrl: function(cID) {
-            return '../../../' + this.url_array[cID][0] + '/' + this.getLookupUrlParams(cID);
+            var forword = '../../../';
+            var suffix = '/change/';
+            var href = window.location.href;
+            if (href.indexOf(suffix, href.length - suffix.length) !== -1) {
+                forword += '../';
+            }
+            return forword + this.url_array[cID][0] + '/' + this.getLookupUrlParams(cID);
         },
         
         getFkId: function() {
