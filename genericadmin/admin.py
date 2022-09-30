@@ -2,27 +2,18 @@ import json
 from functools import update_wrapper
 
 from django.contrib import admin
-from django.conf.urls import url
+from django.urls import re_path
 from django.conf import settings
-try:
-    from django.contrib.contenttypes.generic import GenericForeignKey,  GenericTabularInline, GenericStackedInline
-except ImportError:
-    from django.contrib.contenttypes.admin import GenericStackedInline, GenericTabularInline
-    from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.admin import GenericTabularInline, GenericStackedInline
 
 from django.contrib.contenttypes.models import ContentType
-try:
-    from django.utils.encoding import force_text
-except ImportError:
-    from django.utils.encoding import force_unicode as force_text
+from django.utils.encoding import force_str
 from django.utils.text import capfirst
 from django.contrib.admin.widgets import url_params_from_lookup_dict
 from django.http import HttpResponse, HttpResponseNotAllowed, Http404
-try:
-    from django.contrib.admin.views.main import IS_POPUP_VAR
-except ImportError:
-    from django.contrib.admin.options import IS_POPUP_VAR
-from  django.core.exceptions import ObjectDoesNotExist
+from django.contrib.admin.views.main import IS_POPUP_VAR
+from django.core.exceptions import ObjectDoesNotExist
 from django.views.generic import RedirectView
 
 JS_PATH = getattr(settings, 'GENERICADMIN_JS', 'genericadmin/js/')
@@ -100,12 +91,12 @@ class BaseGenericModelAdmin(object):
             return update_wrapper(wrapper, view)
 
         custom_urls = [
-            url(r'^obj-data/$', wrap(self.generic_lookup), name='admin_genericadmin_obj_lookup'),
-            url(r'^genericadmin-init/$', wrap(self.genericadmin_js_init), name='admin_genericadmin_init'),
+            re_path(r'^obj-data/$', wrap(self.generic_lookup), name='admin_genericadmin_obj_lookup'),
+            re_path(r'^genericadmin-init/$', wrap(self.genericadmin_js_init), name='admin_genericadmin_init'),
 
             # to work with django 2.0
-            url(r'^../obj-data/$', wrap(self.generic_lookup), name='admin_genericadmin_obj_lookup_change'),
-            url(r'^../genericadmin-init/change/$', wrap(self.genericadmin_js_init), name='admin_genericadmin_init'),
+            re_path(r'^../obj-data/$', wrap(self.generic_lookup), name='admin_genericadmin_obj_lookup_change'),
+            re_path(r'^../genericadmin-init/change/$', wrap(self.genericadmin_js_init), name='admin_genericadmin_init'),
         ]
         return custom_urls + super(BaseGenericModelAdmin, self).get_urls()
 
@@ -113,7 +104,7 @@ class BaseGenericModelAdmin(object):
         if request.method == 'GET':
             obj_dict = {}
             for c in ContentType.objects.all():
-                val = force_text('%s/%s' % (c.app_label, c.model))
+                val = force_str('%s/%s' % (c.app_label, c.model))
                 params = self.content_type_lookups.get('%s.%s' % (c.app_label, c.model), {})
                 params = url_params_from_lookup_dict(params)
                 if self.content_type_whitelist:
@@ -145,11 +136,11 @@ class BaseGenericModelAdmin(object):
             }
 
             content_type = ContentType.objects.get(pk=content_type_id)
-            obj_dict["content_type_text"] = capfirst(force_text(content_type))
+            obj_dict["content_type_text"] = capfirst(force_str(content_type))
 
             try:
                 obj = content_type.get_object_for_this_type(pk=object_id)
-                obj_dict["object_text"] = capfirst(force_text(obj))
+                obj_dict["object_text"] = capfirst(force_str(obj))
             except ObjectDoesNotExist:
                 raise Http404
 
