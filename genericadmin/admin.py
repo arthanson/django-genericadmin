@@ -1,8 +1,14 @@
 import json
 from functools import update_wrapper
 
+from django import VERSION
 from django.contrib import admin
-from django.conf.urls import url
+
+try:
+    from django.conf.urls import url
+except ImportError:
+   from django.urls import re_path as url
+
 from django.conf import settings
 try:
     from django.contrib.contenttypes.generic import GenericForeignKey,  GenericTabularInline, GenericStackedInline
@@ -14,7 +20,10 @@ from django.contrib.contenttypes.models import ContentType
 try:
     from django.utils.encoding import force_text
 except ImportError:
-    from django.utils.encoding import force_unicode as force_text
+    try:
+        from django.utils.encoding import force_unicode as force_text
+    except ImportError:
+        from django.utils.encoding import force_str as force_text
 from django.utils.text import capfirst
 from django.contrib.admin.widgets import url_params_from_lookup_dict
 from django.http import HttpResponse, HttpResponseNotAllowed, Http404
@@ -40,6 +49,8 @@ class BaseGenericModelAdmin(object):
             media = list(self.Media.js)
         except:
             media = []
+        if VERSION >= (2,2):
+            media.append('admin/js/jquery.init.js') # Django >= 2.2
         media.append(JS_PATH + 'genericadmin.js')
         self.Media.js = tuple(media)
 
@@ -63,7 +74,12 @@ class BaseGenericModelAdmin(object):
                     fields['prefix'] = prefix
                     field_list.append(fields)
         else:
-            for field in self.model._meta.virtual_fields:
+            try:
+                virtual_fields = self.model._meta.virtual_fields
+            except AttributeError:
+                virtual_fields = self.model._meta.private_fields # Django >= 2.0
+
+            for field in virtual_fields:
                 if isinstance(field, GenericForeignKey) and \
                         field.ct_field not in exclude and field.fk_field not in exclude:
                     field_list.append({
